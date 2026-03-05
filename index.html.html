@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Safesense</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ===== CLEAN BLACK & WHITE THEME ===== */
+:root{
+  --bg:#f5f5f5;--surface:#ffffff;--card:#ffffff;
+  --border:#e0e0e0;--border2:#bdbdbd;
+  --text:#111111;--text2:#444444;--text3:#888888;
+  --success:#1a7a3e;--warning:#b45309;--danger:#c0392b;--info:#1565c0;
+  --accent:#111111;--gold:#b45309;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Noto Sans Devanagari','Rajdhani',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;font-size:16px;}
+::-webkit-scrollbar{width:3px;height:3px;}
+::-webkit-scrollbar-thumb{background:#ccc;border-radius:2px;}
+
+.bg-fx{display:none;}
+
+#app{position:relative;z-index:1;display:flex;flex-direction:column;height:100%;max-width:480px;margin:0 auto;overflow:hidden;background:#f5f5f5;}
+
+/* ===== LOGIN ===== */
+#loginScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100%;padding:30px 20px;background:#fff;}
+.login-logo{text-align:center;margin-bottom:28px;}
+.login-logo .brand{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:#111;letter-spacing:2px;}
+.login-logo .logo-icon{font-size:52px;margin-bottom:10px;display:block;}
+.login-box{width:100%;background:#fff;border:2px solid #111;border-radius:16px;padding:22px;box-shadow:4px 4px 0 #111;}
+.login-title{font-size:20px;font-weight:700;color:#111;margin-bottom:16px;text-align:center;}
+.login-lang{display:flex;gap:8px;margin-bottom:16px;}
+.lang-btn{flex:1;padding:10px;border-radius:8px;border:2px solid #ccc;background:#fff;color:#888;font-size:15px;font-weight:700;cursor:pointer;font-family:'Rajdhani',sans-serif;transition:all .15s;}
+.lang-btn.active{background:#111;color:#fff;border-color:#111;}
+.inp-group{margin-bottom:14px;}
+.inp-label{display:block;font-size:13px;font-weight:700;color:#444;margin-bottom:6px;font-family:'Rajdhani',sans-serif;}
+.inp{width:100%;background:#f9f9f9;border:2px solid #ddd;border-radius:10px;padding:13px 14px;color:#111;font-size:16px;font-family:inherit;outline:none;transition:border-color .15s;}
+.inp:focus{border-color:#111;}
+.inp::placeholder{color:#bbb;}
+.login-btn{width:100%;padding:15px;background:#111;border:none;border-radius:10px;color:#fff;font-size:17px;font-weight:700;cursor:pointer;font-family:'Rajdhani',sans-serif;margin-top:4px;}
+.login-btn:active{background:#333;}
+.login-err{text-align:center;color:var(--danger);font-size:14px;margin-top:10px;font-weight:600;display:none;}
+
+/* ===== HEADER ===== */
+.header{background:#fff;border-bottom:2px solid #111;padding:12px 14px;flex-shrink:0;}
+.header-row1{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.h-brand{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:#111;letter-spacing:1px;}
+.h-user{font-size:13px;color:#666;margin-top:1px;}
+.h-user span{color:#111;font-weight:700;}
+.h-right{display:flex;gap:7px;align-items:center;}
+.h-lang{background:#f0f0f0;border:2px solid #ddd;color:#444;padding:6px 11px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Rajdhani',sans-serif;}
+.h-add{background:#111;border:none;color:#fff;padding:9px 16px;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Rajdhani',sans-serif;}
+.h-add:active{background:#333;}
+.h-logout{background:#fff;border:2px solid #e0e0e0;color:#999;padding:6px 10px;border-radius:8px;font-size:13px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:700;}
+
+/* Stats */
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
+.stat-box{background:#f7f7f7;border:2px solid #e0e0e0;border-radius:10px;padding:8px 5px;text-align:center;}
+.stat-n{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;line-height:1;color:#111;}
+.stat-l{font-size:10px;color:#888;margin-top:2px;font-weight:600;}
+.c1{color:#111}.c2{color:#b45309}.c3{color:#1a7a3e}.c4{color:#7b3fb5}
+
+/* ===== TABS ===== */
+.tabs{display:flex;background:#fff;border-bottom:2px solid #111;overflow-x:auto;flex-shrink:0;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{flex:1;min-width:60px;padding:12px 5px;text-align:center;font-size:12px;font-weight:700;color:#999;cursor:pointer;border-bottom:3px solid transparent;transition:all .15s;font-family:'Rajdhani',sans-serif;white-space:nowrap;}
+.tab.active{color:#111;border-bottom-color:#111;background:#fafafa;}
+
+/* ===== CONTENT ===== */
+.content{flex:1;overflow-y:auto;padding:14px;-webkit-overflow-scrolling:touch;}
+
+/* ===== FILTER BAR ===== */
+.filter-bar{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;}
+.filter-bar::-webkit-scrollbar{display:none;}
+.chip{padding:8px 14px;border-radius:20px;font-size:13px;font-weight:700;border:2px solid #ddd;background:#fff;color:#888;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:'Rajdhani',sans-serif;}
+.chip.active{background:#111;color:#fff;border-color:#111;}
+
+/* ===== ISSUE TYPE CHIPS ===== */
+.issue-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:13px;}
+.issue-chip{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;border:2px solid;cursor:pointer;font-family:'Rajdhani',sans-serif;}
+.it-sitedown{background:#fff0f0;color:#c0392b;border-color:#f5c6c6;}
+.it-footage{background:#fffbf0;color:#b45309;border-color:#f5e0b0;}
+.it-emllock{background:#f5f0ff;color:#6d28d9;border-color:#d8c8f5;}
+.it-hooter{background:#fffbf0;color:#92400e;border-color:#fde68a;}
+.it-pmc{background:#f0fff8;color:#065f46;border-color:#a7f3d0;}
+.it-novideo{background:#f0f5ff;color:#1e40af;border-color:#bfdbfe;}
+.it-other{background:#f5f5f5;color:#555;border-color:#ddd;}
+
+/* ===== CALL CARD ===== */
+.call-card{background:#fff;border:2px solid #e0e0e0;border-radius:14px;padding:14px;margin-bottom:12px;position:relative;overflow:hidden;animation:slideIn .2s ease;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+@keyframes slideIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.call-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:14px 0 0 14px;}
+.call-card.open::before{background:#e67e22;}
+.call-card.inprogress::before{background:#2980b9;}
+.call-card.closed::before{background:#27ae60;}
+.call-card.returnvisit::before{background:#8e44ad;}
+
+.cc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+.cc-id{font-family:'Rajdhani',sans-serif;font-size:12px;color:#888;font-weight:700;letter-spacing:1px;}
+.badge{padding:4px 11px;border-radius:20px;font-size:12px;font-weight:700;font-family:'Rajdhani',sans-serif;}
+.b-open{background:#fff3e0;color:#e67e22;border:2px solid #ffd699;}
+.b-inprogress{background:#e8f4fd;color:#2980b9;border:2px solid #aad4f0;}
+.b-closed{background:#eafaf1;color:#27ae60;border:2px solid #a9dfbf;}
+.b-returnvisit{background:#f5eef8;color:#8e44ad;border:2px solid #d7bde2;}
+
+.cc-issue-tag{display:inline-block;margin-bottom:7px;}
+.cc-title{font-size:16px;font-weight:700;margin-bottom:8px;line-height:1.4;color:#111;}
+.cc-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
+.meta-tag{font-size:13px;color:#555;display:flex;align-items:center;gap:3px;}
+
+/* Visit strip in card */
+.visit-log-strip{background:#f9f9f9;border:1px solid #e8e8e8;border-radius:10px;padding:10px 12px;margin-bottom:9px;}
+.vls-title{font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;font-family:'Rajdhani',sans-serif;}
+.vls-item{display:flex;gap:9px;align-items:flex-start;padding:6px 0;border-bottom:1px solid #f0f0f0;}
+.vls-item:last-child{border-bottom:none;padding-bottom:0;}
+.vls-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.vls-content{flex:1;}
+.vls-date{font-size:11px;color:#aaa;font-family:'Rajdhani',sans-serif;}
+.vls-engineer{font-size:13px;font-weight:700;color:#111;}
+.vls-finding{font-size:13px;color:#555;margin-top:2px;}
+.vls-remark{font-size:12px;color:#b45309;margin-top:2px;}
+.vls-return{display:inline-block;font-size:11px;font-weight:700;color:#8e44ad;background:#f5eef8;border:1px solid #d7bde2;border-radius:6px;padding:2px 9px;margin-top:4px;font-family:'Rajdhani',sans-serif;}
+
+.cc-foot{display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid #f0f0f0;}
+.pay-grp{display:flex;gap:12px;}
+.pay-box{text-align:center;}
+.pay-amt{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;}
+.p-paid{color:#27ae60}.p-pend{color:#e67e22}.p-total{color:#888;}
+.pay-lbl{font-size:10px;color:#aaa;margin-top:1px;}
+.act-btns{display:flex;gap:6px;}
+.abtn{padding:8px 12px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;border:2px solid;font-family:'Rajdhani',sans-serif;transition:transform .1s;}
+.abtn:active{transform:scale(.94);}
+.a-edit{background:#f0f8ff;color:#2980b9;border-color:#aad4f0;}
+.a-pay{background:#eafaf1;color:#27ae60;border-color:#a9dfbf;}
+.a-visit{background:#fffbf0;color:#b45309;border-color:#f5e0b0;}
+.a-share{background:#f5f5f5;color:#555;border-color:#ddd;}
+
+/* Return banner */
+.return-banner{background:#f5eef8;border:2px solid #d7bde2;border-radius:9px;padding:7px 11px;margin-bottom:8px;font-size:13px;color:#8e44ad;font-weight:600;display:flex;align-items:center;gap:5px;}
+
+/* ===== PAYMENT TAB ===== */
+.pay-summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.sum-box{background:#fff;border:2px solid #e0e0e0;border-radius:12px;padding:14px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+.sum-n{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;color:#111;}
+.sum-l{font-size:12px;color:#888;margin-top:3px;font-weight:600;}
+.pay-item{display:flex;justify-content:space-between;align-items:center;background:#fff;border:2px solid #e0e0e0;border-radius:11px;padding:12px;margin-bottom:9px;}
+.pi-left .pi-title{font-size:14px;font-weight:700;color:#111;}
+.pi-left .pi-sub{font-size:12px;color:#888;margin-top:2px;}
+.pi-right{text-align:right;}
+.pi-amt{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;color:#27ae60;}
+.pi-date{font-size:11px;color:#aaa;}
+
+/* ===== VENDOR CARD ===== */
+.vendor-card{background:#fff;border:2px solid #e0e0e0;border-radius:13px;padding:14px;margin-bottom:11px;display:flex;align-items:flex-start;gap:12px;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+.v-avatar{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;font-family:'Rajdhani',sans-serif;flex-shrink:0;background:#111;color:#fff;}
+.v-info{flex:1;}
+.v-name{font-size:16px;font-weight:700;color:#111;}
+.v-type{font-size:13px;color:#666;margin-top:2px;}
+.v-stats{display:flex;gap:12px;margin-top:6px;}
+.v-s{font-size:13px;color:#888;}
+.v-s b{color:#111;font-family:'Rajdhani',sans-serif;font-weight:700;}
+.v-call-btn{background:#eafaf1;border:2px solid #a9dfbf;color:#27ae60;padding:9px 11px;border-radius:10px;cursor:pointer;font-size:18px;flex-shrink:0;}
+
+/* ===== TEAM / USER CARD ===== */
+.user-card{background:#fff;border:2px solid #e0e0e0;border-radius:13px;padding:14px;margin-bottom:11px;}
+.uc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;}
+.uc-info{display:flex;align-items:center;gap:11px;}
+.uc-avatar{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;background:#111;color:#fff;}
+.uc-name{font-size:16px;font-weight:700;color:#111;}
+.uc-role{font-size:12px;color:#888;margin-top:2px;}
+.role-badge{padding:4px 11px;border-radius:20px;font-size:12px;font-weight:700;font-family:'Rajdhani',sans-serif;}
+.rb-admin{background:#fffbf0;color:#92400e;border:2px solid #fde68a;}
+.rb-manager{background:#e8f4fd;color:#1565c0;border:2px solid #aad4f0;}
+.rb-technician{background:#eafaf1;color:#1a7a3e;border:2px solid #a9dfbf;}
+.rb-viewer{background:#f5f5f5;color:#666;border:2px solid #ddd;}
+.perm-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+.perm-item{display:flex;align-items:center;justify-content:space-between;background:#f9f9f9;border:1px solid #e8e8e8;border-radius:9px;padding:9px 11px;}
+.perm-label{font-size:13px;color:#444;font-weight:700;}
+.toggle{position:relative;width:40px;height:22px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:#ddd;border-radius:11px;cursor:pointer;transition:.2s;}
+.toggle-slider::before{content:'';position:absolute;width:18px;height:18px;left:2px;top:2px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.toggle input:checked+.toggle-slider{background:#111;}
+.toggle input:checked+.toggle-slider::before{transform:translateX(18px);}
+.uc-actions{display:flex;gap:8px;margin-top:11px;}
+.uc-btn{flex:1;padding:10px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;border:2px solid;font-family:'Rajdhani',sans-serif;}
+.ucb-edit{background:#e8f4fd;color:#1565c0;border-color:#aad4f0;}
+.ucb-del{background:#fff0f0;color:#c0392b;border-color:#f5c6c6;}
+.ucb-cred{background:#fffbf0;color:#92400e;border-color:#fde68a;}
+
+/* ===== MODAL ===== */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:flex;align-items:flex-end;justify-content:center;animation:fIn .15s;}
+@keyframes fIn{from{opacity:0;}to{opacity:1;}}
+.overlay.hidden{display:none!important;}
+.modal{background:#fff;border:2px solid #111;border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:20px;max-height:90vh;overflow-y:auto;animation:sUp .25s ease-out;box-shadow:0 -4px 0 #111;}
+@keyframes sUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.m-handle{width:40px;height:4px;background:#ddd;border-radius:2px;margin:0 auto 14px;}
+.m-title{font-size:20px;font-weight:700;color:#111;margin-bottom:16px;}
+.fg{margin-bottom:14px;}
+.fl{display:block;font-size:13px;font-weight:700;color:#444;margin-bottom:6px;font-family:'Rajdhani',sans-serif;}
+.fi,.fs,.ft{width:100%;background:#f9f9f9;border:2px solid #ddd;border-radius:10px;padding:12px 14px;color:#111;font-size:15px;font-family:inherit;outline:none;transition:border-color .15s;}
+.fi:focus,.fs:focus,.ft:focus{border-color:#111;background:#fff;}
+.fs option{background:#fff;}
+.ft{resize:vertical;min-height:70px;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.mbtn{width:100%;padding:15px;background:#111;border:none;border-radius:12px;color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:'Rajdhani',sans-serif;margin-top:5px;}
+.mbtn:active{background:#333;}
+.mbtn2{width:100%;padding:13px;background:#fff;border:2px solid #ddd;border-radius:12px;color:#888;font-size:15px;font-weight:700;cursor:pointer;font-family:'Rajdhani',sans-serif;margin-top:9px;}
+.mbtn-danger{background:#c0392b;}
+.mbtn-danger:active{background:#e74c3c;}
+
+/* Issue selector in form */
+.issue-selector{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;}
+.isel-btn{padding:8px 14px;border-radius:20px;font-size:13px;font-weight:700;border:2px solid #ddd;background:#fff;color:#888;cursor:pointer;transition:all .15s;font-family:'Rajdhani',sans-serif;}
+.isel-btn.selected{border-color:#111;color:#111;background:#f0f0f0;}
+
+/* Visit entry in modal */
+.visit-entry{background:#f9f9f9;border:2px solid #e8e8e8;border-radius:12px;padding:13px;margin-bottom:11px;position:relative;}
+.ve-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.ve-date{font-family:'Rajdhani',sans-serif;font-size:13px;color:#888;font-weight:700;}
+.ve-engineer{font-size:15px;font-weight:700;color:#111;}
+.ve-finding{font-size:13px;color:#444;margin-top:5px;padding:8px 10px;background:#fff;border-radius:8px;border:1px solid #eee;}
+.ve-remark{font-size:13px;color:#b45309;margin-top:5px;}
+.ve-return{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#8e44ad;background:#f5eef8;border:2px solid #d7bde2;border-radius:8px;padding:4px 10px;margin-top:6px;}
+.ve-del{position:absolute;top:10px;right:10px;background:#fff0f0;border:2px solid #f5c6c6;color:#c0392b;padding:4px 10px;border-radius:7px;font-size:12px;cursor:pointer;font-weight:700;}
+
+/* Payment summary in modal */
+.pay-sm{background:#f9f9f9;border:2px solid #e8e8e8;border-radius:11px;padding:13px;margin-bottom:15px;}
+.psm-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:14px;color:#444;}
+.psm-row:not(:last-child){border-bottom:1px solid #eee;}
+
+/* Share tab */
+.share-opt{display:flex;align-items:center;gap:14px;padding:15px;background:#fff;border:2px solid #e0e0e0;border-radius:13px;margin-bottom:10px;cursor:pointer;}
+.share-opt:active{background:#f5f5f5;}
+.so-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;background:#f5f5f5;border:2px solid #e0e0e0;}
+.so-title{font-weight:700;font-size:15px;color:#111;}
+.so-desc{font-size:13px;color:#888;margin-top:2px;}
+
+/* Credentials box */
+.cred-box{background:#f9f9f9;border:2px solid #111;border-radius:13px;padding:16px;text-align:center;margin-bottom:14px;}
+.cred-id{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:#111;letter-spacing:3px;}
+.cred-pass{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;color:#b45309;letter-spacing:2px;margin-top:5px;}
+.cred-share{width:100%;padding:13px;background:#25d366;border:none;border-radius:11px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:'Rajdhani',sans-serif;margin-top:10px;}
+
+/* Section titles */
+.sec-title{font-size:13px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:11px;font-family:'Rajdhani',sans-serif;}
+.sec-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;}
+.sec-row .sec-title{margin-bottom:0;}
+.add-sm{background:#111;border:none;color:#fff;padding:9px 15px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Rajdhani',sans-serif;}
+
+/* Empty / locked */
+.empty{text-align:center;padding:50px 20px;color:#bbb;}
+.empty .ei{font-size:44px;margin-bottom:11px;}
+.empty .et{font-size:18px;font-weight:700;margin-bottom:5px;color:#888;}
+.locked-msg{text-align:center;padding:50px 20px;}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:12px 22px;border-radius:20px;font-weight:700;font-size:14px;z-index:9999;white-space:nowrap;animation:tIn .25s,tOut .3s 2.2s forwards;box-shadow:0 3px 10px rgba(0,0,0,.15);}
+.toast.success{background:#111;color:#fff;}
+.toast.error{background:#c0392b;color:#fff;}
+.toast.info{background:#444;color:#fff;}
+@keyframes tIn{from{opacity:0;transform:translateX(-50%) translateY(8px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+@keyframes tOut{to{opacity:0;transform:translateX(-50%) translateY(8px);}}
+.hidden{display:none!important;}
+</style>
+</head>
+<body>
+<div class="bg-fx"></div>
+<div id="app">
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-logo">
+    <img src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCABXAMUDASIAAhEBAxEB/8QAHQAAAQQDAQEAAAAAAAAAAAAAAAUGBwgCBAkDAf/EAGEQAAECBAIFBAcPCxALAAAAAAIDBAABBQYHEggREyIyFCFCUhYjMVFikpMJFRgkM0FDU1ZhcoKls9MXNUdUcXODhbLE0jQ2OFVXY3WBkZShscHC1OIlN0RFZXR2hKLR8P/EABsBAQACAwEBAAAAAAAAAAAAAAAGBwMEBQEC/8QAOBEAAQQBAgIHBAgHAQAAAAAAAgABAwQFERIGIhMUMkFRYaEhMXGBFSMzQmKRseEHJSZSgsHR8P/aAAwDAQACEQMRAD8At3WHzWmszdOzkCIS1zn3/ehtUS9EH9TJmshyZNXmQMp8Re/CPig9UVqiLEC1AintCl784bjCnPqlMxZtzVIOLVPhivsrxHbDI9XrDuEe7x8VJaWIhKp0sxdr0TouOu3NR6iTY3CJJlvJHsh3hhOnelwyl6ujP8EMOVpTn1ct46fW2xIuUfUlp9Lql+lDa7Cq9KevYIlr6W1GNPJR5YZBlqEZAXx1bydZqh0NuycR3D6rbo12Vt1V2TZZVEklVZAplCXDGGNl5VO2ZU1tRlQSdLqEoZEEi7WPR1eFMpeLGdGtOtNawycrIIiiktI1N8eGI6x/d7fERRGfC0aJp+Nvf3onHAFa3MTjf1/yUT40sw14WKp6LbHGq7RkMvO+jH78xU/SjSqWLt6u8skV2LHLPVqQb683j5oW7dwdRrFv06plX3LVR03FYkxQEhHMOaHAywQoSYTm+qtRdF62QpJf1RPymxMZdn0UKCvmJB7XL8U0EcabrBOQmwpCpS6RCpIi8Uo8H2Md3OJJzBOnNBAhIppJkW0Hq72aHU5wLZEetvcbxJPqkgKkR9iXZ42dU2jNN6o9BwgRzNQNW8JaijLX+i5z2xjzLFafL1g6SQuX5KyQup1KiA7pqoyJw3kqgRS1y3hzDEfObuuVu4UbuFE01QLKUiSHdjZw8qK6mDLdwgpMXDdBQM/emJFIf7IyeohdtMF80TFOqtxEV0+uPeipuKxnGfoK0jjIP3fFv+qzsDLHJAMswsQl6LS7M7h+2EfJSg7M7h+2EfJSg7DK/wDayPlRg7DK/wDayPlRiFf1B+P1Ul/lP4UqWjctXqNeSaO1EjSUEiLKnl6MZXdctXplbWaNCSFIQkQ6083rRjaFs1enV9J27SSFIRKRTFTNxDCViHOfZU419QPyY6k1vI18N0kpOJ7+/wB+mi0ooak2Q2xizjtX3s2uD21DycfOzSv+2oeThIpjFepOeTNNmS2XMImplzQrdhdwzlr5Kj5UY4la3nLA9JCRkPzXRlhxsJbZBFl9netw5S7ajL8DEoMjJVsmoXMUwlOcRbOzLjmJelkZ/hRiT0J8lYjtZiMkk+2T6spSia8LfSO6Tru7u01+a4GZ6poPV9PktyUfJ6oqlb+lKYYi1JOuMU1bSVdTTYuGyZbZBMd0VCH2QS4usMWXa1BrX7e88KDUEHCLtuRNXKRZgnmHdKJtJCcfaXAEhJI99yvbZtew8qdKeYuUcqLVzdHLuzhn1BxjKzYuHzg6AKKKZKKZZ72UfiwsUK3b7bPWalUuQHiKRhthkc5Z5CJe91ssN22bfvmkSv8AeXU/Jdg8RWJmPKNpm5i3hHobuUcsfVa24OMfRt+S9t4oCCWZrHZb3M/v+Cr1p2VJ1WbJwpqr2YTcum1QNSYDqlr9KwRp6aH+rDB7/kn/AOawR8zszSkzeLrBUJygB38G/RWmxNQUC4hWnwqoDl+LGlbFxL0OS4g2FdNXey5suUokO6qEnWqfspkKbgN5JTql/wCojR3Qay1WJNWmuFPCSHMPjRVGbx92hkHt1mLm729VN8fZrWarV5u5OP6oyn7VD5aPRDELWYyWpepPpTBXnGGl51VX9qn3kijydtHbYR5U0cIDPhzhlzRpln83FzE5fk3/ABbTY3HG+0W9VMVIqTSqNBdNFJGBd33p96cVwxvmU8TqtPwUfmRiSsPX6jWui3mXanQ6il3iHhhi6QDOTfEDlEh3XbQFM3wd3+6MW9wHlfpBulL39l/RVnxtSepFtH3ap8WzitaNOt+nMF1HgqtmyaJ5W89WYRkP9kMq48SalXb/AKLbVPcVUHNYUzMmbFdNvsW+96YXUISzEQiRbMejCTbOHdfuSjhU6YTMm5kQ76uohIetEd4m2jfKd8Ma/bDN6vVaeii1cJst5wycI7oll9rIcpCXDxRJp6lWMi6Iub9FyMfZs2GEZx2j3d2qswnfSlnPF6HezhVwuGpRo9RR/VKRdYeiQluxHmM120a7HdMWpJrGLYFBUzp5eLLCdbNm3rdVDb8tfp1SqNtoVSdrLZh5QoWbYplwlsxyju7uaEK5aK8t6rrUqoKIk6SESU2RZhHNGxjKlfeJ7vrPBaGWtWthQ6fVeP7qY8Js31FX33xxlhMpFQc014DtoQipLikXCQ9UoceHbMmmCA5uYl26ys/ezEU4agDrIRHiIsoxSP8AEKYwywyRlzfurY4PiEsbsk8v0Tq7Pa1L/ZmPiz/Shw2TXnlaJzytJAJJZdWzlPpQyp2vX5y+tynjjDuw6pVQppPOWtyRkcx1ay15owYG1l5LwDZ3bPb728ltZGCgFYnh03J4SlzylLvQx7+o6VQXVdsZyJ62EdukPEQ9GH0U5SiNbrqa9KvpR2hz6k0xUD2werEk4llgGowztyk+nw8/kuRiRlef6rtMyaSKyiKiayKhJqAWZMh6MOob8rEhESQaF4WWe9/TGFboc6js6vQE9sg63lEx4hKE2dtV/wBamrSivY4crj5CGru2l95vaz+alJS0rYiU2m7zSrO/axIeZsy8Wf6UKWMTG5q7hLWqdaxohV3jTZhnPLmEvVBEvWIhzCP3YbE7XuDKWunKT+NDsxPtF5eeGz+2G1XcUly6SERcI98Z5speCWrKUTXhOzfkkPruvdpqy4GZirRsPQafJc76gxeUyoOKXUmazF82LZrNlRyqJl4Qw9sG8V7lwyqmenlN7RlVMzumKluH4Sftan/xQ5rgzq1AbBxuQVpVbajkpN1gOYhT6Iql7Mj4XEPS4Yji+bRrtmVcaXXW4jtR2jV2gW0bu0/bE1OlFpbwlHaajHZXQjDW/bbxBoA1e3Xm1DhXQU3VkC6qg9GcL1XYp1KmOWCpECblIkSmPdlIh1TjmtZt0V6za+jXbbqBMXwcXSTWHqqD0hi8eAmLlOxRo7iQtFWFZYAPLmuqZJyzcJJqdIf6Y5VmoUL7h9yyiQycrquXmhFHQt+38MqM2VVVRaJVFMDUnrKcpcl7sEKvmmf2Pvxl+awRpu7u+rrIIsLaMrRV+721IqBMlWiysxASzDPrRofVBYz/AN3OJy+EMIGIoqFdCmVIpz5On3B+FDdEVZS50VPJlFX5TiHJ17Zxxvyi/wDapjTxNOWuJl2vipBniCx1/W1x/KMIt3XUhWKeLVFmon2wTIjn1YbEhV9pU8mUejdq7cqTTQaLKqT6IgUcuxn8paAoif2F+FbkeLpQl0g93mlOyEiWutlKXcEpnP4oxtaQ1BN9bjWttwIlacZbaQz9hLi8UpDOHXYluHSkieOxHlao6tXUHqw5nSCLlsog4AVEjHKYlLmnKLE4Mry4qAZJO077tFEeJCjyTlGPZ00VdMF7zTtmrqU6pK5KY+IdZlwpKdb4JRNtftW2blJFzVKa2eGI7iureIe9rl3ZRA2KNhu7TfKOG6ZK0VUu1K8Wx/e1P0ozw+xIq9r7NovM6jSh9gMu2Jfey/uxZFul1tus1C5lX1O/1J+qXB5f/einK5q3RbFteaooooIpDs2zVIZDnLqiMVsQSqV23SKZFtKhVHW8XVzcXxRH8mJgr1EtrFVqNUolYJGpop5chl3PBUT6Pwhjdwiw9VtY1qpWNkdUPMASTnmFJPwffKNWnZipQkRfarauVp8hPGI/Y+SdtbZosLIXZIDkSbs9inLwRHVKIra/qhD74P5UTBdKCjigPUkgJRQ0CkIjLnnzRFrajVYXCUypT0cqg+xeFFOcYV5Z7kZALl7P9q0cBLHDAYkSmcR3Zfcj7lj4PDL7kZRYQt7GUYdYev8AxRFOIv66nHwA/qiVZ93+KIzv5g/XuVVVsxdKpkmn2wAzDEV4xikloMMY7uZv9rtYExC1qXgtK17kUoaKqQtJriqpn3jy6oWvqhLy7lIGX/cf5YavnPWZ9ykPvJQec1a9ekPvIxB6+SzNWMYYt20fL9lIZqePmPeemvxTnPEFWWqfnSPN63KP8sNmtY4p0nHFnhy9oiabRwSIlUieZZASieYd3L1so8XSjzKj1fe/0U+1/eoijGbCq8r7x/dI02mumNPcNW+WrOUFOSiSaPDmHpZt34UT3gy5cuSSjfflZuXVtFHs1XrwMHV0Y4Lni9pJUexKa4nOl0+fJ1FkSzat3aOFB6O6OUYTrnplcwgkVkYh0w7sw1erek15eqNC6JIl7GoPtfCXR4iiYNHHBB/hrXqnXK7VKfUnzhuLdqTRNQdknmzKZs3SLUHixMtxUWmXBR3NIrLJF8wchkWQVHMJSialZEHYB9orgbfvKlts4EtLhuumzpl6sHdoVLMo0eJl6cUEeJHY9FQekRbo/GyxMuBlxS+qvWrDsWjNErDoDWSKzkR1GT3NvKEp7IRbw/g80Z2rgUvYKN6P7KqoHVKixJvQid5szISlrIZl65Zsu94I5oe2j9h6lhzhyypJiB1Vf0xVFhLNtHBcUs3VHh+LHk0zGPa1XojtVevNNPsffjL81gg800+x9+MvzWCNJZFcrVKXdnKNNpUqY8UJJo+aLqD3RSVEpxULTjv2sleCFiMnzlpS2zRNy9TSOYcpUUIsuYpdERHh60RkzwMxfUp6FUaWw9FNVMVA2b7Kpl+Dmjza3gi6Lapd6UGqXelDGwHp9apeEdtMrim7lVQZDykXZZlROe9lL35a9X8UPuPNreCIggiJtLk1E8ALmUTUUTKSaWUkyyl6qMfSKUHbdF23Nu4STURMcpgY5pFKIuuTBejPXM3FJerUvXPeSkO1D4uvnH+WKL2tad53WLkrYpVcq4tyEV+TLKFkzcObeixmhnZN82xf9Ye3RQK1TWq1L2aaj0iykptB3RzFxRngtTVy3RlotWzSgtDtlHVWGsiw6Das9uwRJZ6Q5SdLbyhD3tfrQ7pSj5P7sBS1ylz6oxSSHIW43WWGGOEdkbaMs4NUu9KCOYGJCrj6o1zDyp79dnWURdKe2F4UfOiyrp/BFBqZWlHWhxWqbylxyhhdCO9tizbNTKQ72bN1ol/QANRSy7o2iyymWqJ5dooRewj1oIrNRjql3pRlBBFjql3o1nrxkyTE3bxBqM+ElVBHX40eVdqSVJodQqq3OmzbqLl8ERzRzjlLEHGm+1124O6xV3IkvsJOciLZHNwj0REcwjHmjIukrVZByiKyCqaqZcJgWYZx7xSHA3CrFe08YbceVSi1VlSxdZniiLzaI7PZlxb3Dmyxd6PdERBBBBEQRRXTlWWljYlIXTlNMaK3LKCxCPqi3VKI9Y4XYqvmaDxnaFzuGq6YqJKpqqZTEt4SHegimDzTT7H34y/NYIYellT6rSsGMFabXGzhrUm7B+DlJx6oJele7BBFI2mzhpXVrnTxApDFeoU9VmLeoCkG0JsSebKpl6mUuLo5YjrCbSFvqyJtmi7zsioQbvJHZa1E0/3tbi8bNFrMXscrYw1upnb1eptScydtOUkq2TFQUxzZcpDFU9I68MMryqzGqWFQnFPeFtCqLk2vJhV6va+kXhQRXpse5Kbd1q025KQptGVQRksnr4h74l4QluwvREWiExdMdH+3BeJzTJblDhMS9rUXUIS+MJSL40S7BEREul5+x9uf72j88ES1ES6Xn7H25/vaPzwQRUuwwxUuvDPzw7GFqan54EmTjlbfacPDl3h60XO0V7+uDEXDleuXGo0UeJ1BZuJNktmOUcvR+NFUMAsQrOsIaz2V2sVdJ6SJN8qaZbLKJZuKLR6P+Lto31WH1uWva7miC1b8sPMmmKZbwj3B6UEU0wQQQREc4m1O8+dIx1SSHNy24HjfL4RbTL/5R0djnpZX7Ldj/wBYKfOFBE2bYfzQwkvahKS35vKa41eEmoomX5UWW8z8/WZdX8KJ/MjFYcR2R27iHd1CS3UAqiyJD1hFTMMWe8z8/WZdX8KJ/MjBFZuCCCCLQr1NRq9EfUlx6i8bqIHq6pDljm7cdDvjB2+OTrOHtFqTYiFm/QLKm5T6JCXCQ9YS+NHSxyqKDdRYuEBmU4rZUNJnB+6KQrTbrtqqrNVRyk3Wp4uRKCLV0c9Iyo3LXmlmXs3QnUHWpNjUkJZRWUy+pqD0SLKW8PixaKObmF6DWraQNBTthmszYq14VmKBlmUQbiWbeLwRGOkcERBBBBFRTTpHNjgmPWobf5xaE62tJXEqnI0ehtnNCFm25OzTEme9sxyp8Wbiywo6dMs2Nwj/AMDb/OLQ47Xx6wqplvUqnvMNlXDxkzRRWX5OjvqJiIkXjDBF5+aafY+/GX5rBCBp33O2vOycKbpZt1W7epN6gummrxDKfJe7BBE68X7q0XMSquFaqmItVZVQEJICs1p7vLlHnlmEm880Mi2aXotMasm6rmK1SrLZMs3JJ0Z2imp4KkxR1mP3MsEEEViWmkxgE0aptm15gkikAgmmFIeyERHuSl2mNj0UeBPu5+SXv0MEEER6KPAn3c/JL36GG3iPjpo9X1Zr61qrf7hFm9EZGo3pj0THKUi5u0+9BBBFDHnLokfur3R/M3P+Fh64PXhox4X153WaFiXWHTh225McntPdmMhzCXNlbj1YIIIpW9FHgT7ufkl79DB6KPAn3c/JL36GCCCI9FHgT7ufkl79DEL0uraLNOxISvpDE6uFUEqidQFI2LuaOcimWXLyfh54IIIvDEB9oq3neFRueoYmV1s8qBiawNmTsU5EIiMtUuT+DDwwbxQ0bsLaXUKfQcRqi6SfuJOFSe012ZCUhy7uVuMEEET/APRR4E+7n5Je/QweijwJ93PyS9+hgggi8HWk3gM5bKt1L5nkVAky1Ul73C7vsMVxrND0WFVNdExdrVND2tWlO1xH4PaR1QQQRSDgveei9hi4VqLC+3NRrCwbM3zqlPJkA+uKcpI7o+9EqeijwJ93PyS9+hgggiPRR4E+7n5Je/QweijwJ93PyS9+hgggiiLFq5tF7Eq6xuOtYm1ps6FqDXK0YOxCYgRFLmJuXWKGj5y6JH7q90fzNz/hYIIImrpV3bhxWrQw7tjDi4Fqwztxu8QVJVsskYSPYZNe0AdevIfc16tXPq5oIIIIv//Z" style="width:180px;height:auto;margin-bottom:8px;display:block;margin-left:auto;margin-right:auto;" alt="Safesense Logo">
+    <div class="brand" style="display:none;">Safesense</div>
+    <div style="font-size:11px;color:var(--text3);letter-spacing:1px;margin-top:3px;">E-SURVEILLANCE SERVICE CALL</div>
+  </div>
+  <div class="login-box">
+    <div class="login-lang">
+      <button class="lang-btn active" onclick="setLang('hi',this)">हिंदी</button>
+      <button class="lang-btn" onclick="setLang('en',this)">English</button>
+    </div>
+    <div class="login-title" id="loginTitle">लॉगिन करें</div>
+    <div class="inp-group"><label class="inp-label">User ID</label><input class="inp" id="loginId" placeholder="Enter User ID" autocomplete="off"></div>
+    <div class="inp-group"><label class="inp-label">Password</label><input class="inp" id="loginPass" type="password" placeholder="Enter Password"></div>
+    <button class="login-btn" onclick="doLogin()">🔐 Login</button>
+    <div class="login-err" id="loginErr">❌ Galat ID ya Password!</div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" class="hidden" style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
+  <div class="header">
+    <div class="header-row1">
+      <div><img src="data:image/png;base64,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" style="height:32px;width:auto;" alt="Safesense"><div class="h-user">Welcome, <span id="hUserName">Admin</span></div></div>
+      <div class="h-right">
+        <button class="h-lang" onclick="toggleLang()" id="langToggle">EN</button>
+        <button class="h-add" onclick="openAddModal()" id="hAddBtn">+ <span id="hAddTxt">नया Call</span></button>
+        <button class="h-logout" onclick="doLogout()">⏻</button>
+      </div>
+    </div>
+    <div class="stats-bar">
+      <div class="stat-box"><div class="stat-n c1" id="stTotal">0</div><div class="stat-l" id="stLTotal">कुल</div></div>
+      <div class="stat-box"><div class="stat-n c2" id="stOpen">0</div><div class="stat-l" id="stLOpen">Open</div></div>
+      <div class="stat-box"><div class="stat-n" style="color:#f472b6;" id="stReturn">0</div><div class="stat-l" id="stLReturn">Return Visit</div></div>
+      <div class="stat-box"><div class="stat-n c4" id="stPendAmt">₹0</div><div class="stat-l" id="stLPend">Pending ₹</div></div>
+    </div>
+  </div>
+  <div class="tabs" id="mainTabs">
+    <div class="tab active" onclick="switchTab('calls',this)" id="tabCalls">📋 Calls</div>
+    <div class="tab" onclick="switchTab('payments',this)" id="tabPay">💰 Payment</div>
+    <div class="tab" onclick="switchTab('vendors',this)" id="tabVendors">👷 Vendor</div>
+    <div class="tab" onclick="switchTab('team',this)" id="tabTeam">👥 Team</div>
+    <div class="tab" onclick="switchTab('share',this)" id="tabShare">📤 Share</div>
+  </div>
+  <div class="content">
+    <!-- CALLS -->
+    <div id="tab-calls">
+      <div class="filter-bar">
+        <div class="chip active" onclick="filterBy('all',this)" id="fAll">सभी</div>
+        <div class="chip" onclick="filterBy('open',this)" id="fOpen">Open</div>
+        <div class="chip" onclick="filterBy('inprogress',this)" id="fProg">In Progress</div>
+        <div class="chip" onclick="filterBy('closed',this)" id="fClosed">Closed</div>
+        <div class="chip" onclick="filterBy('returnvisit',this)" id="fReturn">🔄 Return Visit</div>
+        <div class="chip" onclick="filterBy('payPending',this)" id="fPayPend">Pay Pending</div>
+      </div>
+      <div id="callsList"></div>
+    </div>
+    <!-- PAYMENTS -->
+    <div id="tab-payments" class="hidden">
+      <div class="pay-summary-grid">
+        <div class="sum-box"><div class="sum-n" style="color:var(--success)" id="totPaid">₹0</div><div class="sum-l" id="lReceived">Received</div></div>
+        <div class="sum-box"><div class="sum-n" style="color:var(--warning)" id="totPend">₹0</div><div class="sum-l" id="lPending">Pending</div></div>
+      </div>
+      <div class="sec-title" id="lPayHist">Payment History</div>
+      <div id="payList"></div>
+    </div>
+    <!-- VENDORS -->
+    <div id="tab-vendors" class="hidden">
+      <div class="sec-row">
+        <div class="sec-title" id="lVendors">Vendors</div>
+        <button class="add-sm" onclick="openVendorModal()" id="addVendorBtn">+ Add</button>
+      </div>
+      <div id="vendorList"></div>
+    </div>
+    <!-- TEAM -->
+    <div id="tab-team" class="hidden"><div id="teamContent"></div></div>
+    <!-- SHARE -->
+    <div id="tab-share" class="hidden">
+      <div class="sec-title" id="lShare">Share करें</div>
+      <div class="share-opt" onclick="shareWA()"><div class="so-icon" style="background:#e8fdf0;border-color:#a9dfbf;">💬</div><div><div class="so-title">WhatsApp</div><div class="so-desc" id="lWA">Daily report भेजें</div></div></div>
+      <div class="share-opt" onclick="exportCSV()"><div class="so-icon" style="background:#e8f4fd;border-color:#aad4f0;">📊</div><div><div class="so-title">Excel Export</div><div class="so-desc" id="lCSV">Book10 format mein download करें</div></div></div>
+      <div class="share-opt" onclick="document.getElementById('importInput').click()"><div class="so-icon" style="background:#fff8e8;border-color:#f5e0b0;">📥</div><div><div class="so-title">Excel Import</div><div class="so-desc">Book10 Excel file se data load करें</div></div></div>
+      <input type="file" id="importInput" accept=".xlsx,.xls,.csv" class="hidden" onchange="importExcel(this)">
+      <div class="share-opt" onclick="shareApp()"><div class="so-icon" style="background:#f5f5f5;border-color:#ddd;">📱</div><div><div class="so-title" id="lShareApp">App Share करें</div><div class="so-desc" id="lShareDesc">Team को app भेजें</div></div></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- #app -->
+
+<!-- ===== MODALS ===== -->
+
+<!-- ADD CALL -->
+<div class="overlay hidden" id="mAdd">
+<div class="modal">
+  <div class="m-handle"></div>
+  <div class="m-title">🔧 <span id="mAddTitle">नया Service Call</span></div>
+
+  <div style="background:#f5f5f5;border-radius:10px;padding:11px;margin-bottom:13px;">
+    <div style="font-size:11px;font-weight:700;color:#888;letter-spacing:1px;margin-bottom:9px;font-family:'Rajdhani',sans-serif;">📋 BASIC INFO</div>
+    <div class="frow">
+      <div class="fg"><label class="fl">MSP</label>
+        <select class="fs" id="fMsp"><option value="">Select</option><option value="CMS">CMS</option><option value="Diebold">Diebold</option><option value="Euronet">Euronet</option><option value="FSS">FSS</option><option value="Other">Other</option></select>
+      </div>
+      <div class="fg"><label class="fl">Call Type</label>
+        <select class="fs" id="fCallType"><option value="Service">Service</option><option value="Installation">Installation</option><option value="AMC">AMC</option><option value="PMC">PMC</option></select>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Bank</label>
+        <select class="fs" id="fBank"><option value="">Select</option><option value="HDFC">HDFC</option><option value="SBI">SBI</option><option value="ICICI">ICICI</option><option value="Axis">Axis</option><option value="IDFC">IDFC</option><option value="Kotak Mahindra">Kotak Mahindra</option><option value="Other">Other</option></select>
+      </div>
+      <div class="fg"><label class="fl">Ticket Number <span style="color:#27ae60;font-size:10px;font-weight:700;">● AUTO</span></label><input class="fi" id="fTicket" placeholder="Auto generate hoga..." style="background:#f0fff4;border-color:#a9dfbf;color:#27ae60;font-weight:700;font-family:'Rajdhani',sans-serif;letter-spacing:1px;" readonly></div>
+    </div>
+  </div>
+
+  <div style="background:#f5f5f5;border-radius:10px;padding:11px;margin-bottom:13px;">
+    <div style="font-size:11px;font-weight:700;color:#888;letter-spacing:1px;margin-bottom:9px;font-family:'Rajdhani',sans-serif;">📍 SITE DETAILS</div>
+    <div class="fg"><label class="fl">Site Name</label><input class="fi" id="fSite" placeholder="Site ID / Name"></div>
+    <div class="fg"><label class="fl">Location / Address</label><textarea class="ft" id="fLocation" placeholder="Full address..." style="min-height:50px;"></textarea></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">State</label><input class="fi" id="fState" placeholder="State"></div>
+      <div class="fg"><label class="fl">City</label><input class="fi" id="fCity" placeholder="City"></div>
+    </div>
+  </div>
+
+  <div style="background:#f5f5f5;border-radius:10px;padding:11px;margin-bottom:13px;">
+    <div style="font-size:11px;font-weight:700;color:#888;letter-spacing:1px;margin-bottom:9px;font-family:'Rajdhani',sans-serif;">🔧 ISSUE & ENGINEER</div>
+    <div class="fg">
+      <label class="fl" id="lIssueType">Site Issue Type</label>
+      <div class="issue-selector" id="issueSel">
+        <button class="isel-btn" data-val="Site Down" onclick="selIssue(this)">📴 Site Down</button>
+        <button class="isel-btn" data-val="Footage Call" onclick="selIssue(this)">📹 Footage Call</button>
+        <button class="isel-btn" data-val="EML Lock" onclick="selIssue(this)">🔒 EML Lock</button>
+        <button class="isel-btn" data-val="Hooter Issue" onclick="selIssue(this)">🔔 Hooter Issue</button>
+        <button class="isel-btn" data-val="PMC" onclick="selIssue(this)">🛠️ PMC</button>
+        <button class="isel-btn" data-val="Camera No-Video" onclick="selIssue(this)">📷 Camera No-Video</button>
+        <button class="isel-btn" data-val="Other" onclick="selIssue(this)">➕ Other</button>
+      </div>
+    </div>
+    <div class="fg"><label class="fl" id="lProblem">Site Issue (Detail)</label><input class="fi" id="fProblem" placeholder="Issue ka detail..."></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Call Given To</label><input class="fi" id="fCallGivenTo" placeholder="Name"></div>
+      <div class="fg"><label class="fl">Engineer Name</label><input class="fi" id="fEngName" placeholder="Eng. Name"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Call Done By</label><input class="fi" id="fCallDoneBy" placeholder="Name"></div>
+      <div class="fg"><label class="fl">Visit Date</label><input class="fi" id="fVisitDate" type="date"></div>
+    </div>
+  </div>
+
+  <div style="background:#f5f5f5;border-radius:10px;padding:11px;margin-bottom:13px;">
+    <div style="font-size:11px;font-weight:700;color:#888;letter-spacing:1px;margin-bottom:9px;font-family:'Rajdhani',sans-serif;">💰 PAYMENT</div>
+    <div class="frow">
+      <div class="fg"><label class="fl" id="lAmt">Site Visit Charges (₹)</label><input class="fi" id="fAmount" type="number" placeholder="0"></div>
+      <div class="fg"><label class="fl">Fund Status</label>
+        <select class="fs" id="fFundStatus"><option value="Pending">Pending</option><option value="Received">Received</option><option value="Partial">Partial</option></select>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:#f5f5f5;border-radius:10px;padding:11px;margin-bottom:13px;">
+    <div style="font-size:11px;font-weight:700;color:#888;letter-spacing:1px;margin-bottom:9px;font-family:'Rajdhani',sans-serif;">📊 STATUS & REMARKS</div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Call Status</label>
+        <select class="fs" id="fStatus"><option value="open">Open</option><option value="inprogress">In Progress</option><option value="closed">Resolved</option><option value="returnvisit">Return Visit</option></select>
+      </div>
+      <div class="fg"><label class="fl" id="lPri">Priority</label>
+        <select class="fs" id="fPriority"><option value="normal">Normal</option><option value="urgent">Urgent 🔴</option><option value="critical">Critical 🚨</option></select>
+      </div>
+    </div>
+    <div class="fg"><label class="fl" id="lNotes">Other Remarks</label><textarea class="ft" id="fNotes" placeholder="Koi aur baat..."></textarea></div>
+  </div>
+
+  <button class="mbtn" onclick="saveCall()">✅ <span id="btnSaveCall">Save करें</span></button>
+  <button class="mbtn2" onclick="closeM('mAdd')" id="btnCancelAdd">Cancel</button>
+</div>
+</div>
+
+<!-- EDIT CALL -->
+<div class="overlay hidden" id="mEdit">
+<div class="modal">
+  <div class="m-handle"></div>
+  <div class="m-title">✏️ <span id="mEditTitle">Call Update करें</span></div>
+  <input type="hidden" id="eId">
+
+  <div style="background:#f5f5f5;border-radius:10px;padding:11px;margin-bottom:13px;">
+    <div style="font-size:11px;font-weight:700;color:#888;letter-spacing:1px;margin-bottom:9px;font-family:'Rajdhani',sans-serif;">📋 BASIC INFO</div>
+    <div class="frow">
+      <div class="fg"><label class="fl">MSP</label>
+        <select class="fs" id="eMsp"><option value="">Select</option><option value="CMS">CMS</option><option value="Diebold">Diebold</option><option value="Euronet">Euronet</option><option value="FSS">FSS</option><option value="Other">Other</option></select>
+      </div>
+      <div class="fg"><label class="fl">Call Type</label>
+        <select class="fs" id="eCallType"><option value="Service">Service</option><option value="Installation">Installation</option><option value="AMC">AMC</option><option value="PMC">PMC</option></select>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Bank</label>
+        <select class="fs" id="eBank"><option value="">Select</option><option value="HDFC">HDFC</option><option value="SBI">SBI</option><option value="ICICI">ICICI</option><option value="Axis">Axis</option><option value="IDFC">IDFC</option><option value="Kotak Mahindra">Kotak Mahindra</option><option value="Other">Other</option></select>
+      </div>
+      <div class="fg"><label class="fl">Ticket Number</label><input class="fi" id="eTicket"></div>
+    </div>
+  </div>
+
+  <div style="background:#f5f5f5;border-radius:10px;padding:11px;margin-bottom:13px;">
+    <div style="font-size:11px;font-weight:700;color:#888;letter-spacing:1px;margin-bottom:9px;font-family:'Rajdhani',sans-serif;">📍 SITE DETAILS</div>
+    <div class="fg"><label class="fl" id="lESite">Site Name</label><input class="fi" id="eSite"></div>
+    <div class="fg"><label class="fl">Location / Address</label><textarea class="ft" id="eLocation" style="min-height:50px;"></textarea></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">State</label><input class="fi" id="eState"></div>
+      <div class="fg"><label class="fl">City</label><input class="fi" id="eCity"></div>
+    </div>
+  </div>
+
+  <div style="background:#f5f5f5;border-radius:10px;padding:11px;margin-bottom:13px;">
+    <div style="font-size:11px;font-weight:700;color:#888;letter-spacing:1px;margin-bottom:9px;font-family:'Rajdhani',sans-serif;">🔧 ISSUE & ENGINEER</div>
+    <div class="fg">
+      <label class="fl" id="lEIssue">Site Issue Type</label>
+      <div class="issue-selector" id="editIssueSel">
+        <button class="isel-btn" data-val="Site Down" onclick="selEditIssue(this)">📴 Site Down</button>
+        <button class="isel-btn" data-val="Footage Call" onclick="selEditIssue(this)">📹 Footage Call</button>
+        <button class="isel-btn" data-val="EML Lock" onclick="selEditIssue(this)">🔒 EML Lock</button>
+        <button class="isel-btn" data-val="Hooter Issue" onclick="selEditIssue(this)">🔔 Hooter Issue</button>
+        <button class="isel-btn" data-val="PMC" onclick="selEditIssue(this)">🛠️ PMC</button>
+        <button class="isel-btn" data-val="Camera No-Video" onclick="selEditIssue(this)">📷 Camera No-Video</button>
+        <button class="isel-btn" data-val="Other" onclick="selEditIssue(this)">➕ Other</button>
+      </div>
+    </div>
+    <div class="fg"><label class="fl" id="lEProb">Site Issue (Detail)</label><input class="fi" id="eProblem"></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Call Given To</label><input class="fi" id="eCallGivenTo"></div>
+      <div class="fg"><label class="fl">Engineer Name</label><input class="fi" id="eEngName"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Call Done By</label><input class="fi" id="eCallDoneBy"></div>
+      <div class="fg"><label class="fl">Visit Date</label><input class="fi" id="eVisitDate" type="date"></div>
+    </div>
+  </div>
+
+  <div style="background:#f5f5f5;border-radius:10px;padding:11px;margin-bottom:13px;">
+    <div style="font-size:11px;font-weight:700;color:#888;letter-spacing:1px;margin-bottom:9px;font-family:'Rajdhani',sans-serif;">💰 PAYMENT</div>
+    <div class="frow">
+      <div class="fg"><label class="fl" id="lEAmt">Site Visit Charges (₹)</label><input class="fi" id="eAmount" type="number"></div>
+      <div class="fg"><label class="fl">Fund Status</label>
+        <select class="fs" id="eFundStatus"><option value="Pending">Pending</option><option value="Received">Received</option><option value="Partial">Partial</option></select>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:#f5f5f5;border-radius:10px;padding:11px;margin-bottom:13px;">
+    <div style="font-size:11px;font-weight:700;color:#888;letter-spacing:1px;margin-bottom:9px;font-family:'Rajdhani',sans-serif;">📊 STATUS & REMARKS</div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Call Status</label>
+        <select class="fs" id="eStatus"><option value="open">Open</option><option value="inprogress">In Progress</option><option value="returnvisit">🔄 Return Visit</option><option value="closed">Resolved</option></select>
+      </div>
+      <div class="fg"><label class="fl" id="lEPri">Priority</label>
+        <select class="fs" id="ePriority"><option value="normal">Normal</option><option value="urgent">Urgent 🔴</option><option value="critical">Critical 🚨</option></select>
+      </div>
+    </div>
+    <div class="fg"><label class="fl" id="lENotes">Other Remarks</label><textarea class="ft" id="eNotes"></textarea></div>
+  </div>
+
+  <button class="mbtn" onclick="updateCall()">✅ <span id="btnUpdateCall">Update करें</span></button>
+  <button class="mbtn mbtn-danger" style="margin-top:8px;" onclick="deleteCall()">🗑️ <span id="btnDeleteCall">Delete</span></button>
+  <button class="mbtn2" onclick="closeM('mEdit')" id="btnCancelEdit">Cancel</button>
+</div>
+</div>
+
+<!-- VISIT LOG MODAL -->
+<div class="overlay hidden" id="mVisit">
+<div class="modal">
+  <div class="m-handle"></div>
+  <div class="m-title">🧑‍🔧 <span id="mVisitTitle">Engineer Visit Log</span></div>
+  <input type="hidden" id="visitCallId">
+  <div class="fg"><label class="fl" id="lEngName">Engineer Name</label><input class="fi" id="vEngName" placeholder="Engineer ka naam"></div>
+  <div class="fg"><label class="fl" id="lVisitDate">Visit Date</label><input class="fi" id="vVisitDate" type="date"></div>
+  <div class="fg"><label class="fl" id="lFinding">Site pe kya Issue Paya (Finding)</label><textarea class="ft" id="vFinding" placeholder="Engineer ne site pe jaake kya paya..."></textarea></div>
+  <div class="fg"><label class="fl" id="lRemark">Remark / Action Taken</label><textarea class="ft" id="vRemark" placeholder="Kya action liya gaya..."></textarea></div>
+  <div class="fg" style="background:#f5eef8;border:2px solid #d7bde2;border-radius:11px;padding:13px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <label class="fl" style="margin-bottom:0;color:#8e44ad;" id="lReturnNeeded">Return Visit Zaroori Hai?</label>
+      <label class="toggle"><input type="checkbox" id="vReturnNeeded"><span class="toggle-slider" style="background:rgba(244,114,182,.3);"></span></label>
+    </div>
+    <div id="returnReasonBox" class="hidden" style="margin-top:10px;">
+      <label class="fl" id="lReturnReason">Return Visit Reason</label>
+      <textarea class="ft" id="vReturnReason" placeholder="Kyu return visit chahiye..."></textarea>
+    </div>
+  </div>
+  <div class="sec-title" style="margin-top:14px;" id="lPrevVisits">Previous Visits</div>
+  <div id="prevVisitsList"></div>
+  <button class="mbtn" onclick="saveVisit()">✅ <span id="btnSaveVisit">Visit Save करें</span></button>
+  <button class="mbtn2" onclick="closeM('mVisit')" id="btnCancelVisit">Cancel</button>
+</div>
+</div>
+
+<!-- PAYMENT -->
+<div class="overlay hidden" id="mPay">
+<div class="modal">
+  <div class="m-handle"></div>
+  <div class="m-title">💰 <span id="mPayTitle">Payment Record</span></div>
+  <div class="pay-sm" id="paySm"></div>
+  <div class="fg"><label class="fl" id="lPayAmt">Amount Received (₹)</label><input class="fi" id="pAmount" type="number"></div>
+  <div class="fg"><label class="fl" id="lPayMethod">Payment Method</label>
+    <select class="fs" id="pMethod"><option value="cash">💵 Cash</option><option value="upi">📱 UPI/GPay</option><option value="bank">🏦 Bank Transfer</option><option value="cheque">📝 Cheque</option></select>
+  </div>
+  <div class="fg"><label class="fl" id="lTxn">Transaction ID</label><input class="fi" id="pTxn" placeholder="UTR / Reference"></div>
+  <button class="mbtn" onclick="savePayment()">💾 <span id="btnSavePay">Payment Save करें</span></button>
+  <button class="mbtn2" onclick="closeM('mPay')" id="btnCancelPay">Cancel</button>
+</div>
+</div>
+
+<!-- VENDOR -->
+<div class="overlay hidden" id="mVendor">
+<div class="modal">
+  <div class="m-handle"></div>
+  <div class="m-title">👷 <span id="mVendorTitle">Vendor Add करें</span></div>
+  <div class="fg"><label class="fl" id="lVName">Vendor Name</label><input class="fi" id="vName" placeholder="Name"></div>
+  <div class="frow">
+    <div class="fg"><label class="fl" id="lVPhone">Phone</label><input class="fi" id="vPhone" type="tel" placeholder="Mobile"></div>
+    <div class="fg"><label class="fl" id="lVType">Type</label>
+      <select class="fs" id="vType"><option value="CCTV">CCTV</option><option value="DVR/NVR">DVR/NVR</option><option value="Network">Networking</option><option value="Access">Access Control</option><option value="General">General</option></select>
+    </div>
+  </div>
+  <div class="fg"><label class="fl" id="lVAddr">Address</label><input class="fi" id="vAddr" placeholder="City / Area"></div>
+  <div style="background:#f0f7ff;border:2px solid #aad4f0;border-radius:11px;padding:13px;margin-bottom:13px;">
+    <div style="font-size:12px;font-weight:700;color:#1565c0;font-family:'Rajdhani',sans-serif;letter-spacing:1px;margin-bottom:10px;">🏦 BANK DETAILS (Optional)</div>
+    <div class="fg" style="margin-bottom:10px;"><label class="fl" id="lVAccName">Account Holder Name</label><input class="fi" id="vAccName" placeholder="Jaise: Rahul Kumar"></div>
+    <div class="fg" style="margin-bottom:10px;"><label class="fl" id="lVAccNo">Account Number</label><input class="fi" id="vAccNo" placeholder="Bank account number" type="tel"></div>
+    <div class="frow">
+      <div class="fg" style="margin-bottom:0;"><label class="fl" id="lVIfsc">IFSC Code</label><input class="fi" id="vIfsc" placeholder="Jaise: SBIN0001234" style="text-transform:uppercase;"></div>
+      <div class="fg" style="margin-bottom:0;"><label class="fl" id="lVBank">Bank Name</label><input class="fi" id="vBank" placeholder="SBI, HDFC..."></div>
+    </div>
+  </div>
+  <button class="mbtn" onclick="saveVendor()">✅ <span id="btnSaveVendor">Save करें</span></button>
+  <button class="mbtn2" onclick="closeM('mVendor')" id="btnCancelVendor">Cancel</button>
+</div>
+</div>
+
+<!-- TEAM USER -->
+<div class="overlay hidden" id="mUser">
+<div class="modal">
+  <div class="m-handle"></div>
+  <div class="m-title">👤 <span id="mUserTitle">Team Member Add करें</span></div>
+  <input type="hidden" id="uEditId">
+  <div class="fg"><label class="fl" id="lUName">Name</label><input class="fi" id="uName" placeholder="Full name"></div>
+  <div class="frow">
+    <div class="fg"><label class="fl">User ID</label><input class="fi" id="uId" placeholder="Login ID"></div>
+    <div class="fg"><label class="fl">Password</label><input class="fi" id="uPass" placeholder="Password"></div>
+  </div>
+  <div class="fg"><label class="fl" id="lURole">Role</label>
+    <select class="fs" id="uRole" onchange="autoSetPerms(this.value)">
+      <option value="manager">Manager</option>
+      <option value="technician">Technician</option>
+      <option value="viewer">Viewer (Read Only)</option>
+    </select>
+  </div>
+  <div class="sec-title" style="margin-top:12px;" id="lPerms">Permissions</div>
+  <div class="perm-grid">
+    <div class="perm-item"><span class="perm-label" id="lpAddCall">Call Add</span><label class="toggle"><input type="checkbox" id="pAddCall"><span class="toggle-slider"></span></label></div>
+    <div class="perm-item"><span class="perm-label" id="lpEditCall">Call Edit</span><label class="toggle"><input type="checkbox" id="pEditCall"><span class="toggle-slider"></span></label></div>
+    <div class="perm-item"><span class="perm-label" id="lpDelCall">Call Delete</span><label class="toggle"><input type="checkbox" id="pDeleteCall"><span class="toggle-slider"></span></label></div>
+    <div class="perm-item"><span class="perm-label" id="lpPay">Payment</span><label class="toggle"><input type="checkbox" id="pPayment"><span class="toggle-slider"></span></label></div>
+    <div class="perm-item"><span class="perm-label" id="lpVisit">Visit Log</span><label class="toggle"><input type="checkbox" id="pVisit"><span class="toggle-slider"></span></label></div>
+    <div class="perm-item"><span class="perm-label" id="lpExport">Export</span><label class="toggle"><input type="checkbox" id="pExport"><span class="toggle-slider"></span></label></div>
+  </div>
+  <button class="mbtn" onclick="saveUser()" style="margin-top:13px;">✅ <span id="btnSaveUser">Save करें</span></button>
+  <button class="mbtn2" onclick="closeM('mUser')" id="btnCancelUser">Cancel</button>
+</div>
+</div>
+
+<!-- CREDENTIALS -->
+<div class="overlay hidden" id="mCred">
+<div class="modal">
+  <div class="m-handle"></div>
+  <div class="m-title">🔑 <span id="mCredTitle">Login Credentials</span></div>
+  <div class="cred-box">
+    <div style="font-size:11px;color:var(--text3);margin-bottom:6px;" id="lCredId">User ID</div>
+    <div class="cred-id" id="credId">---</div>
+    <div style="font-size:11px;color:var(--text3);margin-top:10px;margin-bottom:4px;" id="lCredPass">Password</div>
+    <div class="cred-pass" id="credPass">---</div>
+  </div>
+  <button class="cred-share" onclick="shareCredWA()">💬 <span id="btnShareCred">WhatsApp पर भेजें</span></button>
+  <button class="mbtn2" onclick="closeM('mCred')" id="btnCloseCred">Close</button>
+</div>
+</div>
+
+<script>
+// ================================================================
+// TRANSLATIONS
+// ================================================================
+const TX = {
+  hi:{
+    loginTitle:'लॉगिन करें',newCall:'नया Call',stTotal:'कुल',stOpen:'Open',stReturn:'Return Visit',stPend:'Pending ₹',
+    tabCalls:'📋 Calls',tabPay:'💰 Payment',tabVendors:'👷 Vendor',tabTeam:'👥 Team',tabShare:'📤 Share',
+    fAll:'सभी',fOpen:'Open',fProg:'In Progress',fClosed:'Closed',fReturn:'🔄 Return Visit',fPayPend:'Pay Pending',
+    received:'Received',pending:'Pending',payHist:'Payment History',vendors:'Vendors',
+    share:'Share करें',waDesc:'Daily report भेजें',csvDesc:'Records download करें',
+    shareApp:'App Share करें',shareDesc:'Team को app भेजें',
+    // Add call
+    mAddTitle:'नया Service Call',issueType:'Issue Type चुनें',problemDesc:'Problem Description',
+    site:'Site',priority:'Priority',vendorA:'Vendor Assign',amount:'Amount (₹)',notes:'Notes',
+    saveCall:'Save करें',cancel:'Cancel',
+    // Edit
+    mEditTitle:'Call Update करें',update:'Update करें',delete:'Delete',
+    // Visit
+    mVisitTitle:'Engineer Visit Log',engName:'Engineer Name',visitDate:'Visit Date',
+    finding:'Site pe kya Issue Paya (Finding)',remark:'Remark / Action Taken',
+    returnNeeded:'Return Visit Zaroori Hai?',returnReason:'Return Visit Reason',
+    prevVisits:'Previous Visits',saveVisit:'Visit Save करें',
+    // Payment
+    mPayTitle:'Payment Record',payAmt:'Amount Received (₹)',payMethod:'Payment Method',
+    txn:'Transaction ID',savePay:'Payment Save करें',
+    // Vendor
+    mVendorTitle:'Vendor Add करें',vname:'Vendor Name',phone:'Phone',type:'Type',addr:'Address',saveVendor:'Save करें',
+    // User
+    mUserTitle:'Team Member Add करें',uname:'Name',role:'Role',perms:'Permissions',
+    pAddCall:'Call Add',pEditCall:'Call Edit',pDelCall:'Call Delete',pPay:'Payment',pVisit:'Visit Log',pExport:'Export',
+    saveUser:'Save करें',
+    // Cred
+    mCredTitle:'Login Credentials',credId:'User ID',credPass:'Password',sendWA:'WhatsApp पर भेजें',close:'Close',
+    // Status
+    sOpen:'Open',sInProgress:'In Progress',sClosed:'Closed',sReturn:'Return Visit',
+    // misc
+    received2:'Received',pending2:'Pending',total:'Total',unassigned:'Unassigned',
+    calls:'Calls',earned:'Earned',teamMembers:'Team Members',addMember:'+ Member Add करें',
+    noData:'कोई data नहीं',noDataSub:'नया item add करें',
+    permLocked:'Yeh feature aapke account mein nahi hai',
+    addVendorBtn:'+ Add',
+  },
+  en:{
+    loginTitle:'Login',newCall:'New Call',stTotal:'Total',stOpen:'Open',stReturn:'Return Visit',stPend:'Pending ₹',
+    tabCalls:'📋 Calls',tabPay:'💰 Payment',tabVendors:'👷 Vendor',tabTeam:'👥 Team',tabShare:'📤 Share',
+    fAll:'All',fOpen:'Open',fProg:'In Progress',fClosed:'Closed',fReturn:'🔄 Return Visit',fPayPend:'Pay Pending',
+    received:'Received',pending:'Pending',payHist:'Payment History',vendors:'Vendors',
+    share:'Share',waDesc:'Send daily report',csvDesc:'Download records',
+    shareApp:'Share App',shareDesc:'Send app to team',
+    mAddTitle:'New Service Call',issueType:'Select Issue Type',problemDesc:'Problem Description',
+    site:'Site',priority:'Priority',vendorA:'Assign Vendor',amount:'Amount (₹)',notes:'Notes',
+    saveCall:'Save',cancel:'Cancel',
+    mEditTitle:'Update Call',update:'Update',delete:'Delete',
+    mVisitTitle:'Engineer Visit Log',engName:'Engineer Name',visitDate:'Visit Date',
+    finding:'Issue Found on Site (Finding)',remark:'Remark / Action Taken',
+    returnNeeded:'Return Visit Required?',returnReason:'Return Visit Reason',
+    prevVisits:'Previous Visits',saveVisit:'Save Visit',
+    mPayTitle:'Record Payment',payAmt:'Amount Received (₹)',payMethod:'Payment Method',
+    txn:'Transaction ID',savePay:'Save Payment',
+    mVendorTitle:'Add Vendor',vname:'Vendor Name',phone:'Phone',type:'Type',addr:'Address',saveVendor:'Save',
+    mUserTitle:'Add Team Member',uname:'Name',role:'Role',perms:'Permissions',
+    pAddCall:'Add Call',pEditCall:'Edit Call',pDelCall:'Delete Call',pPay:'Payment',pVisit:'Visit Log',pExport:'Export',
+    saveUser:'Save',
+    mCredTitle:'Login Credentials',credId:'User ID',credPass:'Password',sendWA:'Send via WhatsApp',close:'Close',
+    sOpen:'Open',sInProgress:'In Progress',sClosed:'Closed',sReturn:'Return Visit',
+    received2:'Received',pending2:'Pending',total:'Total',unassigned:'Unassigned',
+    calls:'Calls',earned:'Earned',teamMembers:'Team Members',addMember:'+ Add Member',
+    noData:'No data found',noDataSub:'Add a new item',
+    permLocked:'This feature is not available for your account',
+    addVendorBtn:'+ Add',
+  }
+};
+
+// ================================================================
+// STATE
+// ================================================================
+let lang = 'hi';
+let currentUser = null;
+let currentFilter = 'all';
+let currentPayCallId = null;
+
+let calls = JSON.parse(localStorage.getItem('st3_calls')||'null') || [
+  {id:'SC-001',msp:'CMS',callType:'Service',bank:'HDFC',ticket:'Client Escalation',issueType:'Camera No-Video',problem:'Sim card replace',site:'P3CNJH18',location:'Opposite Sanjay Gandhi Memorial College, Pandra, Po-Kamre',state:'Jharkhand',city:'Ranchi',callGivenTo:'Deepak Singh',engName:'Deepak Singh',callDoneBy:'Shivam Rai',amount:700,paid:0,fundStatus:'Pending',status:'closed',priority:'normal',visitDate:'2026-02-17',date:'2026-02-17',notes:'',visits:[]},
+  {id:'SC-002',msp:'Diebold',callType:'Service',bank:'HDFC',ticket:'TN23022026075844030',issueType:'EML Lock',problem:'Two way and EML issue',site:'P3DCMI62',location:'Shop no 3 plot 243 Near mauli medical Nandanvan colony Aurangabad',state:'Maharashtra',city:'Aurangabad',callGivenTo:'Laxman Lavkare',engName:'Laxman Lavkare',callDoneBy:'Shivam Tiwari',amount:700,paid:0,fundStatus:'Pending',status:'inprogress',priority:'urgent',visitDate:'2026-02-25',date:'2026-02-25',notes:'',visits:[]}
+];
+let vendors = JSON.parse(localStorage.getItem('st3_vendors')||'null') || [
+  {id:'V-001',name:'Rahul Tech',phone:'9876543210',type:'CCTV',addr:'Mumbai'},
+  {id:'V-002',name:'Kumar Electronics',phone:'8765432109',type:'DVR/NVR',addr:'Thane'}
+];
+let payments = JSON.parse(localStorage.getItem('st3_payments')||'null') || [
+  {id:'P-001',callId:'SC-001',amount:2500,method:'upi',txn:'UPI12345',date:'2026-03-02'},
+  {id:'P-002',callId:'SC-002',amount:2000,method:'cash',txn:'',date:'2026-03-04'}
+];
+let users = JSON.parse(localStorage.getItem('st3_users')||'null') || [
+  {id:'admin',pass:'admin123',name:'Admin (Owner)',role:'admin',perms:{addCall:true,editCall:true,deleteCall:true,payment:true,vendors:true,export:true,visit:true,team:true}}
+];
+
+function saveAll(){
+  localStorage.setItem('st3_calls',JSON.stringify(calls));
+  localStorage.setItem('st3_vendors',JSON.stringify(vendors));
+  localStorage.setItem('st3_payments',JSON.stringify(payments));
+  localStorage.setItem('st3_users',JSON.stringify(users));
+}
+
+// ================================================================
+// LANG
+// ================================================================
+function t(k){ return TX[lang][k]||k; }
+
+function setLang(l,el){
+  lang=l;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+  if(el) el.classList.add('active');
+  document.getElementById('loginTitle').textContent=t('loginTitle');
+}
+
+function toggleLang(){
+  lang=lang==='hi'?'en':'hi';
+  document.getElementById('langToggle').textContent=lang==='hi'?'EN':'HI';
+  applyLang();
+  renderCurrent();
+}
+
+function applyLang(){
+  // Header
+  document.getElementById('hAddTxt').textContent=t('newCall');
+  document.getElementById('stLTotal').textContent=t('stTotal');
+  document.getElementById('stLOpen').textContent=t('stOpen');
+  document.getElementById('stLReturn').textContent=t('stReturn');
+  document.getElementById('stLPend').textContent=t('stPend');
+  // Tabs
+  document.getElementById('tabCalls').textContent=t('tabCalls');
+  document.getElementById('tabPay').textContent=t('tabPay');
+  document.getElementById('tabVendors').textContent=t('tabVendors');
+  document.getElementById('tabTeam').textContent=t('tabTeam');
+  document.getElementById('tabShare').textContent=t('tabShare');
+  // Filters
+  document.getElementById('fAll').textContent=t('fAll');
+  document.getElementById('fOpen').textContent=t('fOpen');
+  document.getElementById('fProg').textContent=t('fProg');
+  document.getElementById('fClosed').textContent=t('fClosed');
+  document.getElementById('fReturn').textContent=t('fReturn');
+  document.getElementById('fPayPend').textContent=t('fPayPend');
+  // Payment tab
+  document.getElementById('lReceived').textContent=t('received');
+  document.getElementById('lPending').textContent=t('pending');
+  document.getElementById('lPayHist').textContent=t('payHist');
+  // Vendors
+  document.getElementById('lVendors').textContent=t('vendors');
+  document.getElementById('addVendorBtn').innerHTML='+ <span>'+t('addVendorBtn').replace('+ ','')+'</span>';
+  // Share
+  document.getElementById('lShare').textContent=t('share');
+  document.getElementById('lWA').textContent=t('waDesc');
+  document.getElementById('lCSV').textContent=t('csvDesc');
+  document.getElementById('lShareApp').textContent=t('shareApp');
+  document.getElementById('lShareDesc').textContent=t('shareDesc');
+  // Modals labels
+  const lmap={
+    mAddTitle:'mAddTitle',lIssueType:'issueType',lProblem:'problemDesc',lSite:'site',lPri:'priority',
+    lVendorA:'vendorA',lAmt:'amount',lNotes:'notes',btnSaveCall:'saveCall',btnCancelAdd:'cancel',
+    mEditTitle:'mEditTitle',lEIssue:'issueType',lEProb:'problemDesc',lESite:'site',lEVendor:'vendorA',
+    lEAmt:'amount',lEPri:'priority',lENotes:'notes',btnUpdateCall:'update',btnDeleteCall:'delete',btnCancelEdit:'cancel',
+    mVisitTitle:'mVisitTitle',lEngName:'engName',lVisitDate:'visitDate',lFinding:'finding',lRemark:'remark',
+    lReturnNeeded:'returnNeeded',lReturnReason:'returnReason',lPrevVisits:'prevVisits',btnSaveVisit:'saveVisit',btnCancelVisit:'cancel',
+    mPayTitle:'mPayTitle',lPayAmt:'payAmt',lPayMethod:'payMethod',lTxn:'txn',btnSavePay:'savePay',btnCancelPay:'cancel',
+    mVendorTitle:'mVendorTitle',lVName:'vname',lVPhone:'phone',lVType:'type',lVAddr:'addr',btnSaveVendor:'saveVendor',btnCancelVendor:'cancel',
+    mUserTitle:'mUserTitle',lUName:'uname',lURole:'role',lPerms:'perms',
+    lpAddCall:'pAddCall',lpEditCall:'pEditCall',lpDelCall:'pDelCall',lpPay:'pPay',lpVisit:'pVisit',lpExport:'pExport',
+    btnSaveUser:'saveUser',btnCancelUser:'cancel',
+    mCredTitle:'mCredTitle',lCredId:'credId',lCredPass:'credPass',btnShareCred:'sendWA',btnCloseCred:'close'
+  };
+  Object.entries(lmap).forEach(([id,key])=>{
+    const el=document.getElementById(id);
+    if(el&&TX[lang][key]) el.textContent=TX[lang][key];
+  });
+}
+
+// ================================================================
+// LOGIN
+// ================================================================
+function doLogin(){
+  const uid=document.getElementById('loginId').value.trim();
+  const pass=document.getElementById('loginPass').value;
+  const user=users.find(u=>u.id===uid&&u.pass===pass);
+  if(!user){document.getElementById('loginErr').style.display='block';return;}
+  currentUser=user;
+  document.getElementById('loginErr').style.display='none';
+  document.getElementById('loginScreen').classList.add('hidden');
+  const ma=document.getElementById('mainApp');
+  ma.classList.remove('hidden'); ma.style.display='flex';
+  document.getElementById('hUserName').textContent=user.name;
+  if(user.role!=='admin') document.getElementById('tabTeam').classList.add('hidden');
+  if(!hasPerm('addCall')) document.getElementById('hAddBtn').classList.add('hidden');
+  document.getElementById('langToggle').textContent=lang==='hi'?'EN':'HI';
+  applyLang(); renderCurrent();
+}
+document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+function doLogout(){
+  currentUser=null;
+  document.getElementById('mainApp').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('loginId').value='';
+  document.getElementById('loginPass').value='';
+}
+
+function hasPerm(p){
+  if(!currentUser) return false;
+  if(currentUser.role==='admin') return true;
+  return !!(currentUser.perms&&currentUser.perms[p]);
+}
+
+// ================================================================
+// ISSUE TYPE HELPERS
+// ================================================================
+const ISSUE_COLORS={
+  'Site Down':'it-sitedown','Footage Call':'it-footage','EML Lock':'it-emllock',
+  'Hooter Issue':'it-hooter','PMC':'it-pmc','Camera No-Video':'it-novideo','Other':'it-other'
+};
+const ISSUE_ICONS={
+  'Site Down':'📴','Footage Call':'📹','EML Lock':'🔒','Hooter Issue':'🔔',
+  'PMC':'🛠️','Camera No-Video':'📷','Other':'➕'
+};
+
+let selectedIssue='';
+let selectedEditIssue='';
+
+function selIssue(btn){
+  document.querySelectorAll('#issueSel .isel-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedIssue=btn.dataset.val;
+}
+function selEditIssue(btn){
+  document.querySelectorAll('#editIssueSel .isel-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedEditIssue=btn.dataset.val;
+}
+
+function issueTag(issueType){
+  if(!issueType) return '';
+  const cls=ISSUE_COLORS[issueType]||'it-other';
+  const icon=ISSUE_ICONS[issueType]||'🔧';
+  return `<span class="issue-chip ${cls}">${icon} ${issueType}</span>`;
+}
+
+// ================================================================
+// STATS
+// ================================================================
+function updateStats(){
+  const open=calls.filter(c=>c.status==='open'||c.status==='inprogress').length;
+  const ret=calls.filter(c=>c.status==='returnvisit').length;
+  const pend=calls.reduce((s,c)=>s+(c.amount-c.paid),0);
+  document.getElementById('stTotal').textContent=calls.length;
+  document.getElementById('stOpen').textContent=open;
+  document.getElementById('stReturn').textContent=ret;
+  document.getElementById('stPendAmt').textContent='₹'+(pend>=1000?(pend/1000).toFixed(1)+'k':pend);
+}
+
+// ================================================================
+// RENDER CALLS
+// ================================================================
+function renderCalls(){
+  updateStats();
+  let filtered=calls;
+  if(currentFilter==='payPending') filtered=calls.filter(c=>c.paid<c.amount);
+  else if(currentFilter!=='all') filtered=calls.filter(c=>c.status===currentFilter);
+
+  const el=document.getElementById('callsList');
+  if(!filtered.length){el.innerHTML=emptyState();return;}
+
+  const sLabel={open:t('sOpen'),inprogress:t('sInProgress'),closed:t('sClosed'),returnvisit:t('sReturn')};
+  const bCls={open:'b-open',inprogress:'b-inprogress',closed:'b-closed',returnvisit:'b-returnvisit'};
+  const pIcon={urgent:'🔴',critical:'🚨',normal:'🟡'};
+
+  el.innerHTML=filtered.map(c=>{
+    const pend=c.amount-c.paid;
+    const canEdit=hasPerm('editCall');
+    const canPay=hasPerm('payment')&&pend>0;
+    const canVisit=hasPerm('visit');
+    const visits=c.visits||[];
+    const lastVisit=visits[visits.length-1];
+
+    let visitHtml='';
+    if(visits.length>0){
+      visitHtml=`<div class="visit-log-strip">
+        <div class="vls-title">🧑‍🔧 Visit Log (${visits.length})</div>
+        ${visits.slice(-2).map(v=>`
+          <div class="vls-item">
+            <div class="vls-dot" style="background:${v.returnNeeded?'#8e44ad':'#27ae60'};"></div>
+            <div class="vls-content">
+              <div style="display:flex;gap:8px;align-items:center;">
+                <span class="vls-engineer">${v.engineer}</span>
+                <span class="vls-date">${v.date}</span>
+              </div>
+              <div class="vls-finding">🔍 ${v.finding}</div>
+              ${v.remark?`<div class="vls-remark">📝 ${v.remark}</div>`:''}
+              ${v.returnNeeded?`<div class="vls-return">🔄 Return: ${v.returnReason||''}</div>`:''}
+            </div>
+          </div>`).join('')}
+      </div>`;
+    }
+
+    const returnBanner=c.status==='returnvisit'&&lastVisit&&lastVisit.returnNeeded?
+      `<div class="return-banner">🔄 Return Visit Pending: ${lastVisit.returnReason||''}</div>`:'';
+    const fundColor={Pending:'#e67e22',Received:'#27ae60',Partial:'#2980b9'}[c.fundStatus]||'#888';
+
+    return `<div class="call-card ${c.status}">
+      <div class="cc-top">
+        <div>
+          <div class="cc-id">${c.id}${c.msp?' • '+c.msp:''}${c.bank?' • '+c.bank:''}</div>
+          ${c.ticket?`<div style="font-size:11px;color:#888;margin-top:1px;">🎫 ${c.ticket}</div>`:''}
+        </div>
+        <span class="badge ${bCls[c.status]||'b-open'}">${sLabel[c.status]||c.status}</span>
+      </div>
+      ${c.issueType?`<div class="cc-issue-tag">${issueTag(c.issueType)}</div>`:''}
+      <div class="cc-title">${pIcon[c.priority]||'🟡'} ${c.problem||c.issueType||'New Call'}</div>
+      ${returnBanner}
+      <div class="cc-meta">
+        <div class="meta-tag">🏢 ${c.site}</div>
+        ${c.city?`<div class="meta-tag">📍 ${c.city}${c.state?', '+c.state:''}</div>`:''}
+        ${c.engName?`<div class="meta-tag">🧑‍🔧 ${c.engName}</div>`:''}
+        ${c.visitDate?`<div class="meta-tag">📅 ${c.visitDate}</div>`:''}
+        ${visits.length?`<div class="meta-tag">📋 ${visits.length} visit${visits.length>1?'s':''}</div>`:''}
+      </div>
+      ${c.callGivenTo||c.callDoneBy?`<div style="font-size:12px;color:#555;margin-bottom:7px;display:flex;gap:12px;flex-wrap:wrap;">
+        ${c.callGivenTo?`<span>📞 Given: <b>${c.callGivenTo}</b></span>`:''}
+        ${c.callDoneBy?`<span>✅ Done: <b>${c.callDoneBy}</b></span>`:''}
+      </div>`:''}
+      ${c.notes?`<div style="font-size:12px;color:#666;background:#f9f9f9;border-radius:7px;padding:6px 9px;margin-bottom:8px;">💬 ${c.notes}</div>`:''}
+      ${visitHtml}
+      <div class="cc-foot">
+        <div class="pay-grp">
+          <div class="pay-box"><div class="pay-amt p-paid">₹${c.paid.toLocaleString()}</div><div class="pay-lbl">${t('received2')}</div></div>
+          <div class="pay-box"><div class="pay-amt p-pend">₹${pend.toLocaleString()}</div><div class="pay-lbl">${t('pending2')}</div></div>
+          <div class="pay-box"><div class="pay-amt p-total">₹${c.amount.toLocaleString()}</div><div class="pay-lbl">${t('total')}</div></div>
+          ${c.fundStatus?`<div class="pay-box"><div class="pay-amt" style="color:${fundColor};font-size:12px;font-weight:700;">${c.fundStatus}</div><div class="pay-lbl">Fund</div></div>`:''}
+        </div>
+        <div class="act-btns">
+          ${canVisit?`<button class="abtn a-visit" onclick="openVisitModal('${c.id}')">🧑‍🔧</button>`:''}
+          ${canEdit?`<button class="abtn a-edit" onclick="openEditModal('${c.id}')">✏️</button>`:''}
+          ${canPay?`<button class="abtn a-pay" onclick="openPayModal('${c.id}')">💰</button>`:''}
+          <button class="abtn a-share" onclick="shareCall('${c.id}')">📤</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ================================================================
+// VISIT LOG
+// ================================================================
+function openVisitModal(callId){
+  if(!hasPerm('visit')){showToast(t('permLocked'),'error');return;}
+  document.getElementById('visitCallId').value=callId;
+  document.getElementById('vEngName').value='';
+  document.getElementById('vVisitDate').value=new Date().toISOString().split('T')[0];
+  document.getElementById('vFinding').value='';
+  document.getElementById('vRemark').value='';
+  document.getElementById('vReturnNeeded').checked=false;
+  document.getElementById('returnReasonBox').classList.add('hidden');
+  document.getElementById('vReturnReason').value='';
+  renderPrevVisits(callId);
+  openM('mVisit');
+}
+
+document.getElementById('vReturnNeeded').addEventListener('change',function(){
+  document.getElementById('returnReasonBox').classList.toggle('hidden',!this.checked);
+});
+
+function renderPrevVisits(callId){
+  const c=calls.find(x=>x.id===callId);
+  const visits=(c&&c.visits)||[];
+  const el=document.getElementById('prevVisitsList');
+  if(!visits.length){el.innerHTML=`<div style="font-size:12px;color:var(--text3);text-align:center;padding:12px;">${lang==='hi'?'Koi visit nahi':'No visits yet'}</div>`;return;}
+  el.innerHTML=[...visits].reverse().map(v=>`
+    <div class="visit-entry">
+      <div class="ve-header">
+        <span class="ve-date">📅 ${v.date}</span>
+        ${hasPerm('editCall')?`<button class="ve-del" onclick="deleteVisit('${callId}','${v.id}')">🗑️</button>`:''}
+      </div>
+      <div class="ve-engineer">🧑‍🔧 ${v.engineer}</div>
+      <div class="ve-finding">🔍 <b>${lang==='hi'?'Finding:':'Finding:'}</b> ${v.finding}</div>
+      ${v.remark?`<div class="ve-remark">📝 <b>${lang==='hi'?'Remark:':'Remark:'}</b> ${v.remark}</div>`:''}
+      ${v.returnNeeded?`<div class="ve-return">🔄 ${lang==='hi'?'Return Zaroori':'Return Required'}: ${v.returnReason||''}</div>`:''}
+    </div>`).join('');
+}
+
+function saveVisit(){
+  const callId=document.getElementById('visitCallId').value;
+  const eng=document.getElementById('vEngName').value.trim();
+  const date=document.getElementById('vVisitDate').value;
+  const finding=document.getElementById('vFinding').value.trim();
+  if(!eng||!finding){showToast(lang==='hi'?'⚠️ Engineer name aur finding fill karein!':'⚠️ Fill engineer name and finding!','error');return;}
+
+  const c=calls.find(x=>x.id===callId);
+  if(!c) return;
+  if(!c.visits) c.visits=[];
+
+  const returnNeeded=document.getElementById('vReturnNeeded').checked;
+  c.visits.push({
+    id:'VL'+Date.now(),
+    engineer:eng,date,finding,
+    remark:document.getElementById('vRemark').value.trim(),
+    returnNeeded,
+    returnReason:returnNeeded?document.getElementById('vReturnReason').value.trim():''
+  });
+
+  // Auto-update status
+  if(returnNeeded && c.status!=='closed') c.status='returnvisit';
+  else if(!returnNeeded && c.status==='returnvisit') c.status='inprogress';
+
+  saveAll(); renderPrevVisits(callId);
+  document.getElementById('vEngName').value='';
+  document.getElementById('vFinding').value='';
+  document.getElementById('vRemark').value='';
+  document.getElementById('vReturnNeeded').checked=false;
+  document.getElementById('returnReasonBox').classList.add('hidden');
+  showToast(lang==='hi'?'✅ Visit log save ho gaya!':'✅ Visit saved!','success');
+  renderCalls();
+}
+
+function deleteVisit(callId,visitId){
+  const c=calls.find(x=>x.id===callId);
+  if(!c) return;
+  c.visits=c.visits.filter(v=>v.id!==visitId);
+  saveAll(); renderPrevVisits(callId); renderCalls();
+}
+
+// ================================================================
+// ADD / EDIT / DELETE CALL
+// ================================================================
+function generateTicketId(){
+  const msp=document.getElementById('fMsp').value||'XX';
+  const bank=document.getElementById('fBank').value||'BK';
+  const now=new Date();
+  const dd=String(now.getDate()).padStart(2,'0');
+  const mm=String(now.getMonth()+1).padStart(2,'0');
+  const yy=String(now.getFullYear()).slice(-2);
+  const hh=String(now.getHours()).padStart(2,'0');
+  const min=String(now.getMinutes()).padStart(2,'0');
+  const seq=String(calls.length+1).padStart(4,'0');
+  // Format: MSP-BANK-DDMMYY-HHMM-SEQ  e.g. CMS-HDFC-050326-1430-0003
+  const mspCode=msp.substring(0,4).toUpperCase();
+  const bankCode=bank.replace(/\s+/g,'').substring(0,5).toUpperCase();
+  return `${mspCode}-${bankCode}-${dd}${mm}${yy}-${hh}${min}-${seq}`;
+}
+
+function openAddModal(){
+  if(!hasPerm('addCall')){showToast(t('permLocked'),'error');return;}
+  selectedIssue='';
+  document.querySelectorAll('#issueSel .isel-btn').forEach(b=>b.classList.remove('selected'));
+  ['fProblem','fSite','fLocation','fState','fCity','fCallGivenTo','fEngName','fCallDoneBy','fAmount','fNotes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('fMsp').value='';
+  document.getElementById('fBank').value='';
+  document.getElementById('fVisitDate').value=new Date().toISOString().split('T')[0];
+  document.getElementById('fStatus').value='open';
+  document.getElementById('fPriority').value='normal';
+  document.getElementById('fFundStatus').value='Pending';
+  document.getElementById('fTicket').value='';
+  document.getElementById('fTicket').placeholder='MSP & Bank select karo...';
+  openM('mAdd');
+}
+
+// Auto-generate ticket when MSP or Bank changes
+document.addEventListener('DOMContentLoaded',()=>{
+  ['fMsp','fBank'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('change',()=>{
+      const msp=document.getElementById('fMsp').value;
+      const bank=document.getElementById('fBank').value;
+      if(msp||bank) document.getElementById('fTicket').value=generateTicketId();
+    });
+  });
+});
+
+function saveCall(){
+  const site=document.getElementById('fSite').value.trim();
+  if(!site){showToast(lang==='hi'?'⚠️ Site Name fill karein!':'⚠️ Fill Site Name!','error');return;}
+  const id='SC-'+String(calls.length+1).padStart(3,'0');
+  calls.unshift({
+    id,
+    msp:document.getElementById('fMsp').value,
+    callType:document.getElementById('fCallType').value,
+    bank:document.getElementById('fBank').value,
+    ticket:document.getElementById('fTicket').value.trim()||generateTicketId(),
+    issueType:selectedIssue||'Other',
+    problem:document.getElementById('fProblem').value.trim(),
+    site,
+    location:document.getElementById('fLocation').value.trim(),
+    state:document.getElementById('fState').value.trim(),
+    city:document.getElementById('fCity').value.trim(),
+    callGivenTo:document.getElementById('fCallGivenTo').value.trim(),
+    engName:document.getElementById('fEngName').value.trim(),
+    callDoneBy:document.getElementById('fCallDoneBy').value.trim(),
+    visitDate:document.getElementById('fVisitDate').value,
+    amount:parseInt(document.getElementById('fAmount').value)||0,
+    fundStatus:document.getElementById('fFundStatus').value,
+    paid:0,
+    status:document.getElementById('fStatus').value,
+    priority:document.getElementById('fPriority').value,
+    notes:document.getElementById('fNotes').value.trim(),
+    date:new Date().toISOString().split('T')[0],
+    visits:[]
+  });
+  saveAll(); closeM('mAdd'); renderCalls();
+  showToast(lang==='hi'?'✅ Call add ho gaya!':'✅ Call added!','success');
+}
+
+function openEditModal(callId){
+  if(!hasPerm('editCall')){showToast(t('permLocked'),'error');return;}
+  const c=calls.find(x=>x.id===callId);
+  if(!c) return;
+  selectedEditIssue=c.issueType||'';
+  document.querySelectorAll('#editIssueSel .isel-btn').forEach(b=>{b.classList.toggle('selected',b.dataset.val===c.issueType);});
+  document.getElementById('eId').value=c.id;
+  document.getElementById('eMsp').value=c.msp||'';
+  document.getElementById('eCallType').value=c.callType||'Service';
+  document.getElementById('eBank').value=c.bank||'';
+  document.getElementById('eTicket').value=c.ticket||'';
+  document.getElementById('eProblem').value=c.problem||'';
+  document.getElementById('eSite').value=c.site||'';
+  document.getElementById('eLocation').value=c.location||'';
+  document.getElementById('eState').value=c.state||'';
+  document.getElementById('eCity').value=c.city||'';
+  document.getElementById('eCallGivenTo').value=c.callGivenTo||'';
+  document.getElementById('eEngName').value=c.engName||'';
+  document.getElementById('eCallDoneBy').value=c.callDoneBy||'';
+  document.getElementById('eVisitDate').value=c.visitDate||'';
+  document.getElementById('eAmount').value=c.amount||0;
+  document.getElementById('eFundStatus').value=c.fundStatus||'Pending';
+  document.getElementById('eStatus').value=c.status||'open';
+  document.getElementById('ePriority').value=c.priority||'normal';
+  document.getElementById('eNotes').value=c.notes||'';
+  openM('mEdit');
+}
+
+function updateCall(){
+  const id=document.getElementById('eId').value;
+  const idx=calls.findIndex(c=>c.id===id);
+  if(idx<0) return;
+  calls[idx]={...calls[idx],
+    issueType:selectedEditIssue||calls[idx].issueType,
+    msp:document.getElementById('eMsp').value,
+    callType:document.getElementById('eCallType').value,
+    bank:document.getElementById('eBank').value,
+    ticket:document.getElementById('eTicket').value,
+    problem:document.getElementById('eProblem').value,
+    site:document.getElementById('eSite').value,
+    location:document.getElementById('eLocation').value,
+    state:document.getElementById('eState').value,
+    city:document.getElementById('eCity').value,
+    callGivenTo:document.getElementById('eCallGivenTo').value,
+    engName:document.getElementById('eEngName').value,
+    callDoneBy:document.getElementById('eCallDoneBy').value,
+    visitDate:document.getElementById('eVisitDate').value,
+    amount:parseInt(document.getElementById('eAmount').value)||0,
+    fundStatus:document.getElementById('eFundStatus').value,
+    status:document.getElementById('eStatus').value,
+    priority:document.getElementById('ePriority').value,
+    notes:document.getElementById('eNotes').value
+  };
+  saveAll(); closeM('mEdit'); renderCalls();
+  showToast(lang==='hi'?'✅ Call update ho gaya!':'✅ Call updated!','success');
+}
+
+function deleteCall(){
+  if(!hasPerm('deleteCall')){showToast(t('permLocked'),'error');return;}
+  const id=document.getElementById('eId').value;
+  if(!confirm(lang==='hi'?'Delete karna chahte hain?':'Delete this call?')) return;
+  calls=calls.filter(c=>c.id!==id);
+  saveAll(); closeM('mEdit'); renderCalls();
+  showToast(lang==='hi'?'🗑️ Delete ho gaya!':'🗑️ Deleted!','info');
+}
+
+// ================================================================
+// PAYMENT
+// ================================================================
+function openPayModal(callId){
+  if(!hasPerm('payment')){showToast(t('permLocked'),'error');return;}
+  const c=calls.find(x=>x.id===callId);
+  if(!c) return;
+  currentPayCallId=callId;
+  const pend=c.amount-c.paid;
+  document.getElementById('paySm').innerHTML=`
+    <div class="psm-row"><span>Call ID</span><span style="color:var(--accent);font-family:'Rajdhani';font-weight:700;">${c.id}</span></div>
+    <div class="psm-row"><span>${issueTag(c.issueType)}</span><span style="font-size:12px;">${c.problem.substring(0,25)}</span></div>
+    <div class="psm-row"><span>${t('total')}</span><span style="color:var(--accent);font-family:'Rajdhani';font-weight:700;">₹${c.amount.toLocaleString()}</span></div>
+    <div class="psm-row"><span>${t('received2')}</span><span style="color:var(--success);font-family:'Rajdhani';font-weight:700;">₹${c.paid.toLocaleString()}</span></div>
+    <div class="psm-row"><span>${t('pending2')}</span><span style="color:var(--warning);font-family:'Rajdhani';font-weight:700;">₹${pend.toLocaleString()}</span></div>`;
+  document.getElementById('pAmount').value=pend;
+  document.getElementById('pTxn').value='';
+  openM('mPay');
+}
+
+function savePayment(){
+  const c=calls.find(x=>x.id===currentPayCallId);
+  if(!c) return;
+  const amt=parseInt(document.getElementById('pAmount').value)||0;
+  if(amt<=0){showToast(lang==='hi'?'⚠️ Valid amount darj karein!':'⚠️ Enter valid amount!','error');return;}
+  payments.push({id:'P-'+String(payments.length+1).padStart(3,'0'),callId:c.id,amount:amt,method:document.getElementById('pMethod').value,txn:document.getElementById('pTxn').value,date:new Date().toISOString().split('T')[0]});
+  const idx=calls.findIndex(x=>x.id===c.id);
+  calls[idx].paid=Math.min(calls[idx].paid+amt,calls[idx].amount);
+  if(calls[idx].paid>=calls[idx].amount) calls[idx].status='closed';
+  saveAll(); closeM('mPay'); renderCalls();
+  showToast(lang==='hi'?'💰 Payment save ho gaya!':'💰 Payment saved!','success');
+}
+
+// ================================================================
+// PAYMENTS TAB
+// ================================================================
+function renderPayments(){
+  if(!hasPerm('payment')){document.getElementById('tab-payments').innerHTML=lockedMsg();return;}
+  const tp=payments.reduce((s,p)=>s+p.amount,0);
+  const tpend=calls.reduce((s,c)=>s+(c.amount-c.paid),0);
+  document.getElementById('totPaid').textContent='₹'+tp.toLocaleString();
+  document.getElementById('totPend').textContent='₹'+tpend.toLocaleString();
+  const mI={cash:'💵',upi:'📱',bank:'🏦',cheque:'📝'};
+  const list=document.getElementById('payList');
+  if(!payments.length){list.innerHTML=emptyState();return;}
+  list.innerHTML=[...payments].reverse().map(p=>{
+    const c=calls.find(cc=>cc.id===p.callId);
+    return `<div class="pay-item">
+      <div class="pi-left">
+        <div class="pi-title">${c?c.problem.substring(0,28):p.callId}</div>
+        <div class="pi-sub">${mI[p.method]||'💰'} ${p.method.toUpperCase()}${p.txn?' • '+p.txn:''}</div>
+      </div>
+      <div class="pi-right"><div class="pi-amt">+₹${p.amount.toLocaleString()}</div><div class="pi-date">${p.date}</div></div>
+    </div>`;
+  }).join('');
+}
+
+// ================================================================
+// VENDORS
+// ================================================================
+function openVendorModal(){
+  if(!hasPerm('vendors')){showToast(t('permLocked'),'error');return;}
+  ['vName','vPhone','vAddr','vAccName','vAccNo','vIfsc','vBank'].forEach(id=>document.getElementById(id).value='');
+  openM('mVendor');
+}
+function saveVendor(){
+  const name=document.getElementById('vName').value.trim();
+  if(!name){showToast(lang==='hi'?'⚠️ Naam fill karein!':'⚠️ Name required!','error');return;}
+  vendors.push({
+    id:'V-'+String(vendors.length+1).padStart(3,'0'),
+    name,phone:document.getElementById('vPhone').value,
+    type:document.getElementById('vType').value,
+    addr:document.getElementById('vAddr').value,
+    accName:document.getElementById('vAccName').value.trim(),
+    accNo:document.getElementById('vAccNo').value.trim(),
+    ifsc:document.getElementById('vIfsc').value.trim().toUpperCase(),
+    bank:document.getElementById('vBank').value.trim()
+  });
+  saveAll(); closeM('mVendor'); renderVendors();
+  showToast(lang==='hi'?'✅ Vendor add ho gaya!':'✅ Vendor added!','success');
+}
+function renderVendors(){
+  if(!hasPerm('vendors')){document.getElementById('tab-vendors').innerHTML=lockedMsg();return;}
+  if(currentUser.role!=='admin') document.getElementById('addVendorBtn').classList.add('hidden');
+  const cols=['#00c8ff','#7c3aed','#10b981','#f59e0b','#ef4444','#06ffa5'];
+  const list=document.getElementById('vendorList');
+  if(!vendors.length){list.innerHTML=emptyState();return;}
+  list.innerHTML=vendors.map((v,i)=>{
+    const vc=calls.filter(c=>c.vendor===v.name);
+    const earned=payments.filter(p=>{const c=calls.find(cc=>cc.id===p.callId);return c&&c.vendor===v.name;}).reduce((s,p)=>s+p.amount,0);
+    const returnV=vc.filter(c=>c.status==='returnvisit').length;
+    return `<div class="vendor-card">
+      <div class="v-avatar" style="background:${cols[i%cols.length]}18;color:${cols[i%cols.length]};">${v.name.charAt(0)}</div>
+      <div class="v-info">
+        <div class="v-name">${v.name}</div>
+        <div class="v-type">📞 ${v.phone} • ${v.type}${v.addr?' • '+v.addr:''}</div>
+        ${v.accNo?`<div style="font-size:12px;color:#1565c0;margin-top:5px;background:#e8f4fd;border:1px solid #aad4f0;border-radius:7px;padding:5px 9px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <span>🏦 ${v.bank||'Bank'}</span>
+          <span style="font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:.5px;">${v.accNo}</span>
+          ${v.ifsc?`<span style="color:#888;">IFSC: ${v.ifsc}</span>`:''}
+          ${v.accName?`<span style="color:#555;">👤 ${v.accName}</span>`:''}
+        </div>`:''}
+        <div class="v-stats">
+          <div class="v-s">${t('calls')}: <b>${vc.length}</b></div>
+          <div class="v-s">${t('earned')}: <b style="color:#27ae60;">₹${earned.toLocaleString()}</b></div>
+          ${returnV?`<div class="v-s">🔄 Return: <b style="color:#8e44ad;">${returnV}</b></div>`:''}
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <button class="v-call-btn" onclick="window.location='tel:+91${v.phone}'">📞</button>
+        ${v.accNo?`<button onclick="copyBank('${v.id}')" style="background:#f5f5f5;border:2px solid #ddd;color:#555;padding:8px 10px;border-radius:9px;cursor:pointer;font-size:15px;" title="Copy Bank">📋</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ================================================================
+// TEAM
+// ================================================================
+function renderTeam(){
+  const el=document.getElementById('teamContent');
+  if(currentUser.role!=='admin'){el.innerHTML=lockedMsg();return;}
+  const members=users.filter(u=>u.role!=='admin');
+  el.innerHTML=`
+    <div class="sec-row">
+      <div class="sec-title">${t('teamMembers')}</div>
+      <button class="add-sm" onclick="openUserModal()">${t('addMember')}</button>
+    </div>
+    ${members.length?members.map(u=>userCard(u)).join(''):emptyState()}`;
+}
+
+function userCard(u){
+  const rb={manager:'rb-manager',technician:'rb-technician',viewer:'rb-viewer'}[u.role]||'rb-viewer';
+  const rLabel={manager:'Manager',technician:'Technician',viewer:'Viewer'}[u.role]||u.role;
+  const pk=['addCall','editCall','deleteCall','payment','visit','export'];
+  const pl={addCall:t('pAddCall'),editCall:t('pEditCall'),deleteCall:t('pDelCall'),payment:t('pPay'),visit:t('pVisit'),export:t('pExport')};
+  return `<div class="user-card">
+    <div class="uc-top">
+      <div class="uc-info">
+        <div class="uc-avatar" style="background:rgba(0,200,255,.12);color:var(--accent);">${u.name.charAt(0)}</div>
+        <div><div class="uc-name">${u.name}</div><div class="uc-role">ID: ${u.id}</div></div>
+      </div>
+      <span class="role-badge ${rb}">${rLabel}</span>
+    </div>
+    <div class="perm-grid">
+      ${pk.map(k=>`<div class="perm-item">
+        <span class="perm-label">${pl[k]}</span>
+        <label class="toggle"><input type="checkbox" ${u.perms&&u.perms[k]?'checked':''} onchange="togglePerm('${u.id}','${k}',this.checked)"><span class="toggle-slider"></span></label>
+      </div>`).join('')}
+    </div>
+    <div class="uc-actions">
+      <button class="uc-btn ucb-cred" onclick="showCred('${u.id}')">🔑 ${lang==='hi'?'Password':'Credentials'}</button>
+      <button class="uc-btn ucb-edit" onclick="openUserModal('${u.id}')">✏️</button>
+      <button class="uc-btn ucb-del" onclick="deleteUser('${u.id}')">🗑️</button>
+    </div>
+  </div>`;
+}
+
+function togglePerm(uid,p,val){const u=users.find(x=>x.id===uid);if(u){u.perms[p]=val;saveAll();}}
+
+function openUserModal(uid){
+  document.getElementById('uEditId').value=uid||'';
+  if(uid){
+    const u=users.find(x=>x.id===uid);
+    if(!u) return;
+    document.getElementById('uName').value=u.name;
+    document.getElementById('uId').value=u.id;
+    document.getElementById('uPass').value=u.pass;
+    document.getElementById('uRole').value=u.role;
+    ['addCall','editCall','deleteCall','payment','visit','export'].forEach(p=>{
+      const el=document.getElementById('p'+p.charAt(0).toUpperCase()+p.slice(1));
+      if(el) el.checked=!!(u.perms&&u.perms[p]);
+    });
+  } else {
+    ['uName','uId','uPass'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('uRole').value='technician';
+    autoSetPerms('technician');
+  }
+  openM('mUser');
+}
+
+function autoSetPerms(role){
+  const p={manager:{addCall:true,editCall:true,deleteCall:false,payment:true,visit:true,export:true},technician:{addCall:true,editCall:true,deleteCall:false,payment:false,visit:true,export:false},viewer:{addCall:false,editCall:false,deleteCall:false,payment:false,visit:false,export:false}}[role]||{};
+  Object.keys(p).forEach(k=>{const el=document.getElementById('p'+k.charAt(0).toUpperCase()+k.slice(1));if(el)el.checked=p[k];});
+}
+
+function saveUser(){
+  const name=document.getElementById('uName').value.trim();
+  const uid=document.getElementById('uId').value.trim();
+  const pass=document.getElementById('uPass').value.trim();
+  if(!name||!uid||!pass){showToast(lang==='hi'?'⚠️ Sab fields fill karein!':'⚠️ All fields required!','error');return;}
+  const editId=document.getElementById('uEditId').value;
+  if(!editId&&users.find(u=>u.id===uid)){showToast(lang==='hi'?'⚠️ Yeh ID already exist karta hai!':'⚠️ ID already exists!','error');return;}
+  const perms={addCall:document.getElementById('pAddCall').checked,editCall:document.getElementById('pEditCall').checked,deleteCall:document.getElementById('pDeleteCall').checked,payment:document.getElementById('pPayment').checked,visit:document.getElementById('pVisit').checked,export:document.getElementById('pExport').checked};
+  const role=document.getElementById('uRole').value;
+  if(editId){const idx=users.findIndex(u=>u.id===editId);if(idx>=0)users[idx]={...users[idx],id:uid,pass,name,role,perms};}
+  else users.push({id:uid,pass,name,role,perms});
+  saveAll(); closeM('mUser'); renderTeam(); showCred(uid);
+}
+
+function deleteUser(uid){
+  if(!confirm(lang==='hi'?'Member delete karein?':'Delete this member?')) return;
+  users=users.filter(u=>u.id!==uid);
+  saveAll(); renderTeam();
+  showToast(lang==='hi'?'🗑️ Delete ho gaya!':'🗑️ Deleted!','info');
+}
+
+function showCred(uid){
+  const u=users.find(x=>x.id===uid);
+  if(!u) return;
+  document.getElementById('credId').textContent=u.id;
+  document.getElementById('credPass').textContent=u.pass;
+  document.getElementById('mCred').dataset.uid=uid;
+  openM('mCred');
+}
+function shareCredWA(){
+  const uid=document.getElementById('mCred').dataset.uid;
+  const u=users.find(x=>x.id===uid);
+  if(!u) return;
+  const msg=`🎥 *Safesense*\n\n👤 ${u.name}\n🔑 ID: \`${u.id}\`\n🔒 Password: \`${u.pass}\`\n\n📱 App mein login karein!`;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+
+function copyBank(vid){
+  const v=vendors.find(x=>x.id===vid);
+  if(!v||!v.accNo) return;
+  const txt=`🏦 Bank Details - ${v.name}\nAccount Name: ${v.accName||v.name}\nAccount No: ${v.accNo}\nIFSC Code: ${v.ifsc}\nBank: ${v.bank}`;
+  if(navigator.clipboard) navigator.clipboard.writeText(txt).then(()=>showToast(lang==='hi'?'📋 Bank details copy ho gayi!':'📋 Bank details copied!','info'));
+  else{
+    const wa=`https://wa.me/?text=${encodeURIComponent(txt)}`;
+    window.open(wa,'_blank');
+  }
+}
+
+// ================================================================
+// SHARE
+// ================================================================
+function shareWA(){
+  if(!hasPerm('export')){showToast(t('permLocked'),'error');return;}
+  const tp=payments.reduce((s,p)=>s+p.amount,0);
+  const tpend=calls.reduce((s,c)=>s+(c.amount-c.paid),0);
+  const retV=calls.filter(c=>c.status==='returnvisit').length;
+  const txt=`📊 *Safesense - Daily Report*\n\n📋 Total Calls: ${calls.length}\n✅ Closed: ${calls.filter(c=>c.status==='closed').length}\n🔴 Open: ${calls.filter(c=>c.status==='open').length}\n🔄 Return Visit: ${retV}\n\n💰 Collected: ₹${tp.toLocaleString()}\n⏳ Pending: ₹${tpend.toLocaleString()}\n\n📍 Issue Breakdown:\n${Object.entries(calls.reduce((acc,c)=>{acc[c.issueType]=(acc[c.issueType]||0)+1;return acc;},{})).map(([k,v])=>`  • ${k}: ${v}`).join('\n')}\n\n_Safesense_`;
+  window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
+}
+function exportCSV(){
+  if(!hasPerm('export')){showToast(t('permLocked'),'error');return;}
+  // Exact Book10 column order
+  const headers=['MSP','Call Types','Bank','Ticket Number','Site Name','Location','State','City','Site Issue','Call Given TO','Eng Name','Site visite charges','Fund Status','Account Details','IFSC Code','Call Status','Visit Date','Other Remarks','Call Done by'];
+  const rows=[headers];
+  calls.forEach(c=>{
+    rows.push([
+      c.msp||'',
+      c.callType||'Service',
+      c.bank||'',
+      c.ticket||'',
+      c.site||'',
+      c.location||'',
+      c.state||'',
+      c.city||'',
+      c.problem||c.issueType||'',
+      c.callGivenTo||'',
+      c.engName||'',
+      c.amount||0,
+      c.fundStatus||'Pending',
+      '',  // Account Details (from vendor)
+      '',  // IFSC Code (from vendor)
+      c.status==='closed'?'Resolved':c.status==='inprogress'?'In Progress':c.status==='returnvisit'?'Return Visit':'Open',
+      c.visitDate||c.date||'',
+      c.notes||'',
+      c.callDoneBy||''
+    ]);
+  });
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='ServiceCalls_'+new Date().toISOString().split('T')[0]+'.csv';
+  a.click();
+  showToast(lang==='hi'?'📊 Excel format mein download ho raha hai!':'📊 Downloading in Excel format!','success');
+}
+
+// ================================================================
+// IMPORT EXCEL
+// ================================================================
+function importExcel(input){
+  const file=input.files[0];
+  if(!file){return;}
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const text=e.target.result;
+      const lines=text.split('\n').filter(l=>l.trim());
+      if(lines.length<2){showToast('⚠️ File mein data nahi mila!','error');return;}
+      // Parse CSV (handle quoted fields)
+      function parseCSVLine(line){
+        const result=[];let cur='';let inQ=false;
+        for(let i=0;i<line.length;i++){
+          const ch=line[i];
+          if(ch==='"'){
+            if(inQ&&line[i+1]==='"'){cur+='"';i++;}
+            else inQ=!inQ;
+          } else if(ch===','&&!inQ){result.push(cur.trim());cur='';}
+          else cur+=ch;
+        }
+        result.push(cur.trim());
+        return result;
+      }
+      const header=parseCSVLine(lines[0]).map(h=>h.replace(/^"|"$/g,'').toLowerCase().trim());
+      // Column index map — matches Book10 format
+      const ci={
+        msp:        header.indexOf('msp'),
+        callType:   header.findIndex(h=>h.includes('call type')||h.includes('call types')),
+        bank:       header.indexOf('bank'),
+        ticket:     header.findIndex(h=>h.includes('ticket')),
+        site:       header.findIndex(h=>h.includes('site name')),
+        location:   header.findIndex(h=>h.includes('location')),
+        state:      header.indexOf('state'),
+        city:       header.indexOf('city'),
+        problem:    header.findIndex(h=>h.includes('site issue')||h.includes('issue')),
+        callGivenTo:header.findIndex(h=>h.includes('call given')),
+        engName:    header.findIndex(h=>h.includes('eng name')||h.includes('engineer')),
+        amount:     header.findIndex(h=>h.includes('charge')||h.includes('charges')),
+        fundStatus: header.findIndex(h=>h.includes('fund')),
+        accDetails: header.findIndex(h=>h.includes('account')),
+        ifsc:       header.findIndex(h=>h.includes('ifsc')),
+        status:     header.findIndex(h=>h.includes('call status')||h.includes('status')),
+        visitDate:  header.findIndex(h=>h.includes('visit date')),
+        notes:      header.findIndex(h=>h.includes('remark')),
+        callDoneBy: header.findIndex(h=>h.includes('done by')||h.includes('call done'))
+      };
+      let imported=0; let skipped=0;
+      for(let i=1;i<lines.length;i++){
+        const cols=parseCSVLine(lines[i]).map(v=>v.replace(/^"|"$/g,'').trim());
+        if(cols.every(v=>!v)) continue;
+        const g=(k)=>ci[k]>=0?cols[ci[k]]||'':'';
+        const siteName=g('site');
+        if(!siteName){skipped++;continue;}
+        // Check duplicate ticket
+        const ticket=g('ticket');
+        if(ticket&&calls.find(c=>c.ticket===ticket)){skipped++;continue;}
+        const rawStatus=(g('status')||'').toLowerCase();
+        const status=rawStatus.includes('resolv')||rawStatus.includes('close')?'closed':
+                     rawStatus.includes('progress')?'inprogress':
+                     rawStatus.includes('return')?'returnvisit':'open';
+        const rawFund=(g('fundStatus')||'Pending');
+        calls.push({
+          id:'SC-'+String(calls.length+1).padStart(3,'0'),
+          msp:g('msp'),callType:g('callType'),bank:g('bank'),ticket,
+          site:siteName,location:g('location'),state:g('state'),city:g('city'),
+          issueType:'Other',problem:g('problem'),
+          callGivenTo:g('callGivenTo'),engName:g('engName'),callDoneBy:g('callDoneBy'),
+          amount:parseInt(g('amount'))||0,fundStatus:rawFund,
+          paid:rawFund==='Received'?parseInt(g('amount'))||0:0,
+          status,priority:'normal',
+          visitDate:g('visitDate'),date:g('visitDate')||new Date().toISOString().split('T')[0],
+          notes:g('notes'),visits:[]
+        });
+        imported++;
+      }
+      saveAll();
+      // Switch to calls tab
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      document.getElementById('tabCalls').classList.add('active');
+      document.querySelectorAll('[id^="tab-"]').forEach(t=>t.classList.add('hidden'));
+      document.getElementById('tab-calls').classList.remove('hidden');
+      currentTab='calls';
+      renderCalls();
+      input.value='';
+      showToast(`✅ ${imported} calls import ho gaye!${skipped?' ('+skipped+' skip)':''}`, 'success');
+    } catch(err){
+      showToast('⚠️ Import error: '+err.message,'error');
+      console.error(err);
+    }
+  };
+  reader.readAsText(file,'UTF-8');
+}
+function shareApp(){
+  const text=lang==='hi'?'Safesense - E-Surveillance Service Call':'Safesense - E-Surveillance Service Call';
+  if(navigator.share)navigator.share({title:'Safesense',text,url:window.location.href});
+  else navigator.clipboard.writeText(window.location.href).then(()=>showToast(lang==='hi'?'📋 Link copy hua!':'📋 Link copied!','info'));
+}
+function shareCall(callId){
+  const c=calls.find(x=>x.id===callId);
+  if(!c)return;
+  const visits=(c.visits||[]);
+  const lastV=visits[visits.length-1];
+  let txt=`🔧 *Service Call: ${c.id}*\n`;
+  if(c.msp) txt+=`• MSP: ${c.msp}\n`;
+  if(c.bank) txt+=`• Bank: ${c.bank}\n`;
+  if(c.ticket) txt+=`• Ticket: ${c.ticket}\n`;
+  txt+=`🏷️ Issue: ${c.issueType||'-'}\n⚠️ Problem: ${c.problem||'-'}\n🏢 Site: ${c.site}`;
+  if(c.city) txt+=`\n📍 ${c.city}${c.state?', '+c.state:''}`;
+  if(c.engName) txt+=`\n🧑‍🔧 Engineer: ${c.engName}`;
+  if(c.callGivenTo) txt+=`\n📞 Call Given To: ${c.callGivenTo}`;
+  if(c.callDoneBy) txt+=`\n✅ Done By: ${c.callDoneBy}`;
+  txt+=`\n📊 Status: ${c.status.toUpperCase()}\n💰 Charges: ₹${c.amount} | Fund: ${c.fundStatus||'-'}`;
+  if(c.visitDate) txt+=`\n📅 Visit: ${c.visitDate}`;
+  if(lastV) txt+=`\n\n🔍 Last Finding: ${lastV.finding}\n📝 Remark: ${lastV.remark||'-'}`;
+  if(c.notes) txt+=`\n💬 Remarks: ${c.notes}`;
+  if(navigator.share)navigator.share({title:'Call '+c.id,text:txt});
+  else navigator.clipboard.writeText(txt).then(()=>showToast(lang==='hi'?'📋 Copy hua!':'📋 Copied!','info'));
+}
+
+// ================================================================
+// HELPERS
+// ================================================================
+let currentTab='calls';
+function switchTab(tab,el){
+  currentTab=tab;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('[id^="tab-"]').forEach(t=>t.classList.add('hidden'));
+  document.getElementById('tab-'+tab).classList.remove('hidden');
+  renderCurrent(); applyLang();
+}
+function filterBy(f,el){
+  currentFilter=f;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderCalls();
+}
+function renderCurrent(){
+  if(currentTab==='calls')renderCalls();
+  else if(currentTab==='payments')renderPayments();
+  else if(currentTab==='vendors')renderVendors();
+  else if(currentTab==='team')renderTeam();
+}
+function populateVendorSel(id){
+  const sel=document.getElementById(id);
+  sel.innerHTML='<option value="">-- Select --</option>'+vendors.map(v=>`<option value="${v.name}">${v.name} (${v.type})</option>`).join('');
+}
+function emptyState(){return`<div class="empty"><div class="ei">📭</div><div class="et">${t('noData')}</div><div class="es">${t('noDataSub')}</div></div>`;}
+function lockedMsg(){return`<div class="locked-msg"><div style="font-size:40px;margin-bottom:10px;">🔒</div><div style="font-size:14px;color:var(--text2);">${t('permLocked')}</div></div>`;}
+function openM(id){document.getElementById(id).classList.remove('hidden');}
+function closeM(id){document.getElementById(id).classList.add('hidden');}
+document.querySelectorAll('.overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.add('hidden');});});
+function showToast(msg,type='info'){
+  const t=document.createElement('div');t.className=`toast ${type}`;t.textContent=msg;
+  document.body.appendChild(t);setTimeout(()=>t.remove(),2700);
+}
+</script>
+</body>
+</html>
