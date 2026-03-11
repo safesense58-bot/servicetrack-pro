@@ -1,1 +1,1683 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ParkPro — Parking Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+/* ===== DESIGN SYSTEM ===== */
+:root {
+  --bg: #050b14;
+  --surface: #0d1520;
+  --surface2: #111e2e;
+  --surface3: #162237;
+  --border: #1d2f45;
+  --border2: #243a55;
+  --gold: #e8a020;
+  --gold2: #f5c05a;
+  --blue: #2d7ef7;
+  --blue2: #5a9fff;
+  --green: #16c784;
+  --green2: #4ddea4;
+  --red: #e84060;
+  --red2: #f07090;
+  --orange: #f07830;
+  --purple: #7c5af7;
+  --text: #e8edf5;
+  --text2: #8fa3be;
+  --text3: #4d6680;
+  --radius: 14px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { 
+  background: var(--bg); 
+  color: var(--text); 
+  font-family: 'Plus Jakarta Sans', sans-serif; 
+  min-height: 100vh;
+  background-image: radial-gradient(ellipse at 20% 20%, rgba(45,126,247,0.06) 0%, transparent 60%), radial-gradient(ellipse at 80% 80%, rgba(232,160,32,0.05) 0%, transparent 60%);
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
+
+/* ===== LOGIN SCREEN ===== */
+#loginScreen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: var(--bg);
+  background-image: 
+    radial-gradient(ellipse at 30% 30%, rgba(45,126,247,0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 70%, rgba(232,160,32,0.08) 0%, transparent 50%);
+}
+.login-box {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 24px;
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(45,126,247,0.1);
+  animation: fadeUp 0.5s ease;
+}
+@keyframes fadeUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+.login-logo {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.login-logo .park-icon {
+  width: 64px; height: 64px;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.8rem;
+  margin: 0 auto 16px;
+  box-shadow: 0 8px 24px rgba(232,160,32,0.35);
+}
+.login-logo h1 { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.5px; }
+.login-logo h1 span { color: var(--gold); }
+.login-logo p { color: var(--text2); font-size: 0.85rem; margin-top: 4px; }
+.login-label { font-size: 0.72rem; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; display: block; }
+.login-input {
+  width: 100%;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  padding: 13px 16px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  margin-bottom: 16px;
+}
+.login-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(45,126,247,0.15); }
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--gold), #d4891a);
+  border: none;
+  border-radius: 10px;
+  color: #000;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+  margin-top: 4px;
+}
+.login-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(232,160,32,0.35); }
+.login-err { background: rgba(232,64,96,0.12); border: 1px solid rgba(232,64,96,0.3); border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; color: var(--red2); margin-bottom: 12px; display: none; }
+
+/* ===== APP SHELL ===== */
+#appShell { display: none; min-height: 100vh; }
+
+/* ===== TOPBAR ===== */
+.topbar {
+  background: rgba(13,21,32,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.tb-logo { display: flex; align-items: center; gap: 10px; }
+.tb-logo .ico { width: 36px; height: 36px; background: linear-gradient(135deg, var(--gold), var(--gold2)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+.tb-logo .name { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.3px; }
+.tb-logo .name span { color: var(--gold); }
+.tb-right { display: flex; align-items: center; gap: 10px; }
+.tb-clock { background: var(--surface2); border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; color: var(--gold); font-weight: 700; font-family: 'Baloo 2', sans-serif; letter-spacing: 0.5px; }
+.lang-toggle { display: flex; background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; }
+.lang-btn { padding: 6px 13px; font-size: 0.78rem; font-weight: 700; cursor: pointer; border: none; background: transparent; color: var(--text2); transition: all 0.2s; font-family: 'Plus Jakarta Sans', sans-serif; }
+.lang-btn.active { background: var(--gold); color: #000; }
+.user-chip { display: flex; align-items: center; gap: 8px; background: var(--surface2); border: 1px solid var(--border); padding: 6px 14px 6px 8px; border-radius: 20px; cursor: pointer; transition: border-color 0.2s; position: relative; }
+.user-chip:hover { border-color: var(--border2); }
+.user-avatar { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; color: #000; }
+.user-name { font-size: 0.8rem; font-weight: 700; }
+.user-role { font-size: 0.68rem; color: var(--text2); }
+.user-menu { position: absolute; top: calc(100% + 8px); right: 0; background: var(--surface); border: 1px solid var(--border2); border-radius: 12px; min-width: 160px; box-shadow: var(--shadow); padding: 6px; display: none; z-index: 200; }
+.user-menu.show { display: block; animation: fadeDown 0.2s ease; }
+@keyframes fadeDown { from { opacity:0; transform: translateY(-8px); } to { opacity:1; transform: translateY(0); } }
+.umenu-item { padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.83rem; font-weight: 600; color: var(--text2); transition: all 0.15s; display: flex; align-items: center; gap: 8px; }
+.umenu-item:hover { background: var(--surface2); color: var(--text); }
+.umenu-item.danger { color: var(--red2); }
+.umenu-item.danger:hover { background: rgba(232,64,96,0.1); }
+
+/* ===== SIDEBAR + LAYOUT ===== */
+.app-layout { display: flex; min-height: calc(100vh - 62px); }
+.sidebar {
+  width: 230px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 16px 10px;
+  position: sticky;
+  top: 62px;
+  height: calc(100vh - 62px);
+  overflow-y: auto;
+}
+.nav-section { margin-bottom: 6px; }
+.nav-section-label { font-size: 0.65rem; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; padding: 0 10px; margin: 16px 0 6px; }
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--text2);
+  font-size: 0.85rem;
+  font-weight: 600;
+  position: relative;
+}
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.active { background: linear-gradient(135deg, rgba(232,160,32,0.15), rgba(232,160,32,0.05)); color: var(--gold); border: 1px solid rgba(232,160,32,0.2); }
+.nav-item .nav-ico { font-size: 1.05rem; width: 22px; text-align: center; }
+.nav-badge { margin-left: auto; background: var(--red); color: #fff; font-size: 0.65rem; font-weight: 800; padding: 2px 7px; border-radius: 10px; }
+.main-content { flex: 1; padding: 24px; overflow-y: auto; min-width: 0; }
+
+/* ===== PAGE SECTIONS ===== */
+.page { display: none; animation: fadeIn 0.3s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.page-header { margin-bottom: 22px; }
+.page-title { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; }
+.page-title span { color: var(--gold); }
+.page-sub { color: var(--text2); font-size: 0.85rem; margin-top: 3px; }
+
+/* ===== STAT CARDS ===== */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 22px; }
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, border-color 0.2s;
+}
+.stat-card:hover { transform: translateY(-2px); border-color: var(--border2); }
+.stat-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+.sc-gold::after { background: linear-gradient(90deg, var(--gold), var(--gold2)); }
+.sc-blue::after { background: linear-gradient(90deg, var(--blue), var(--blue2)); }
+.sc-green::after { background: linear-gradient(90deg, var(--green), var(--green2)); }
+.sc-red::after { background: linear-gradient(90deg, var(--red), var(--red2)); }
+.sc-purple::after { background: linear-gradient(90deg, var(--purple), #a07ef7); }
+.sc-orange::after { background: linear-gradient(90deg, var(--orange), #f5a060); }
+.stat-label { font-size: 0.72rem; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
+.stat-value { font-size: 2rem; font-weight: 800; line-height: 1; letter-spacing: -1px; }
+.sv-gold { color: var(--gold); } .sv-blue { color: var(--blue2); } .sv-green { color: var(--green); }
+.sv-red { color: var(--red2); } .sv-purple { color: var(--purple); } .sv-orange { color: var(--orange); }
+.stat-ico { position: absolute; right: 16px; top: 16px; font-size: 1.5rem; opacity: 0.25; }
+.stat-sub { font-size: 0.72rem; color: var(--text3); margin-top: 6px; }
+
+/* ===== CARDS ===== */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; margin-bottom: 16px; }
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.card-title { font-size: 1rem; font-weight: 800; }
+.card-title span { color: var(--gold); }
+
+/* ===== FORMS ===== */
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+.fg { display: flex; flex-direction: column; gap: 6px; }
+.fg label { font-size: 0.72rem; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.8px; }
+.fg input, .fg select, .fg textarea {
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  padding: 11px 14px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.fg input:focus, .fg select:focus, .fg textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(45,126,247,0.12); }
+.fg input::placeholder { color: var(--text3); }
+.fg select option { background: var(--surface2); }
+
+/* VEHICLE NUMBER */
+.vnum-wrap { display: grid; grid-template-columns: 80px 68px 80px 100px; gap: 8px; }
+.vnum-part input { text-align: center; font-weight: 800; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; }
+.vnum-lbl { font-size: 0.62rem; color: var(--text3); text-align: center; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.vnum-preview { margin-top: 8px; background: rgba(232,160,32,0.08); border: 1.5px solid rgba(232,160,32,0.3); border-radius: 10px; padding: 10px 16px; text-align: center; font-size: 1.15rem; font-weight: 800; color: var(--gold); letter-spacing: 4px; }
+
+/* VEHICLE TYPE */
+.vtype-grid { display: flex; gap: 8px; }
+.vt-btn { flex: 1; padding: 12px 8px; border: 1.5px solid var(--border); border-radius: 10px; background: var(--surface2); cursor: pointer; text-align: center; transition: all 0.2s; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 0.82rem; color: var(--text2); }
+.vt-btn .ico { font-size: 1.6rem; display: block; margin-bottom: 4px; }
+.vt-btn.act-auto { border-color: var(--gold); color: var(--gold); background: rgba(232,160,32,0.08); }
+.vt-btn.act-bike { border-color: var(--blue); color: var(--blue2); background: rgba(45,126,247,0.08); }
+.vt-btn.act-car { border-color: var(--green); color: var(--green); background: rgba(22,199,132,0.08); }
+
+/* ===== BUTTONS ===== */
+.btn { padding: 10px 20px; border-radius: 9px; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 0.88rem; cursor: pointer; border: none; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.btn:hover { transform: translateY(-1px); }
+.btn-gold { background: linear-gradient(135deg, var(--gold), #d4891a); color: #000; box-shadow: 0 4px 14px rgba(232,160,32,0.25); }
+.btn-blue { background: var(--blue); color: #fff; }
+.btn-green { background: var(--green); color: #000; font-weight: 800; }
+.btn-red { background: var(--red); color: #fff; }
+.btn-purple { background: var(--purple); color: #fff; }
+.btn-orange { background: var(--orange); color: #fff; }
+.btn-ghost { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+.btn-ghost:hover { color: var(--text); border-color: var(--border2); }
+.btn-sm { padding: 6px 13px; font-size: 0.78rem; border-radius: 7px; }
+.btn-xs { padding: 4px 10px; font-size: 0.72rem; border-radius: 6px; }
+
+/* ===== TABLE ===== */
+.tbl-wrap { overflow-x: auto; border-radius: 12px; }
+table { width: 100%; border-collapse: collapse; }
+thead tr { background: var(--surface2); }
+th { padding: 10px 14px; font-size: 0.7rem; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.8px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+td { padding: 12px 14px; font-size: 0.87rem; border-bottom: 1px solid rgba(29,47,69,0.6); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: rgba(45,126,247,0.03); }
+.td-time { font-size: 0.72rem; color: var(--text3); margin-top: 2px; }
+.td-vnum { font-weight: 800; letter-spacing: 2px; font-size: 0.92rem; }
+
+/* ===== BADGES ===== */
+.badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; white-space: nowrap; }
+.bg-auto { background: rgba(232,160,32,0.15); color: var(--gold2); }
+.bg-bike { background: rgba(45,126,247,0.15); color: var(--blue2); }
+.bg-car { background: rgba(22,199,132,0.15); color: var(--green2); }
+.bg-paid { background: rgba(22,199,132,0.15); color: var(--green2); }
+.bg-unpaid { background: rgba(232,64,96,0.15); color: var(--red2); }
+.bg-pass { background: rgba(124,90,247,0.15); color: #a07ef7; }
+.bg-daily { background: rgba(232,160,32,0.12); color: var(--gold); }
+.bg-expired { background: rgba(232,64,96,0.18); color: var(--red2); border: 1px solid rgba(232,64,96,0.3); }
+.bg-holding { background: rgba(240,120,48,0.15); color: #f5a060; }
+.bg-released { background: rgba(22,199,132,0.15); color: var(--green2); }
+.bg-scrap { background: rgba(232,64,96,0.18); color: var(--red2); border: 1px solid rgba(232,64,96,0.25); }
+.bg-admin { background: rgba(232,160,32,0.18); color: var(--gold); }
+.bg-operator { background: rgba(45,126,247,0.18); color: var(--blue2); }
+.bg-viewer { background: rgba(124,90,247,0.18); color: #a07ef7; }
+
+/* ===== ALERTS ===== */
+.alert { border-radius: 10px; padding: 13px 16px; margin-bottom: 8px; display: flex; align-items: flex-start; gap: 12px; }
+.al-red { background: rgba(232,64,96,0.08); border: 1px solid rgba(232,64,96,0.25); }
+.al-gold { background: rgba(232,160,32,0.08); border: 1px solid rgba(232,160,32,0.25); }
+.al-green { background: rgba(22,199,132,0.08); border: 1px solid rgba(22,199,132,0.25); }
+.al-orange { background: rgba(240,120,48,0.08); border: 1px solid rgba(240,120,48,0.25); }
+.al-ico { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+.al-body { flex: 1; }
+.al-title { font-weight: 700; font-size: 0.9rem; }
+.al-sub { font-size: 0.77rem; color: var(--text2); margin-top: 3px; line-height: 1.5; }
+
+/* ===== PASS CARD ===== */
+.pass-card { background: linear-gradient(135deg, rgba(124,90,247,0.08), rgba(124,90,247,0.03)); border: 1px solid rgba(124,90,247,0.25); border-radius: var(--radius); padding: 20px; margin-bottom: 12px; position: relative; overflow: hidden; }
+.pass-card::after { content: 'P'; position: absolute; right: -8px; top: -8px; font-size: 5rem; font-weight: 900; color: rgba(124,90,247,0.06); line-height: 1; }
+.pass-num { font-size: 1.2rem; font-weight: 800; color: var(--purple); letter-spacing: 3px; }
+.pass-info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+.pif { }
+.pif label { font-size: 0.65rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.6px; }
+.pif p { font-size: 0.88rem; font-weight: 700; margin-top: 3px; }
+
+/* ===== HOLDING CARD ===== */
+.holding-card { background: linear-gradient(135deg, rgba(240,120,48,0.07), rgba(240,120,48,0.02)); border: 1px solid rgba(240,120,48,0.25); border-radius: var(--radius); padding: 20px; margin-bottom: 12px; }
+
+/* ===== SCRAP CARD ===== */
+.scrap-card { background: linear-gradient(135deg, rgba(232,64,96,0.07), rgba(232,64,96,0.02)); border: 1px solid rgba(232,64,96,0.25); border-radius: var(--radius); padding: 20px; margin-bottom: 12px; }
+
+/* ===== BALANCE ===== */
+.day-row { display: grid; grid-template-columns: 1.4fr 0.8fr 1fr 1fr; gap: 8px; align-items: center; padding: 10px 14px; background: var(--surface2); border-radius: 9px; margin-bottom: 6px; }
+.veh-bal-card { background: var(--surface); border: 1px solid var(--border); border-radius: 11px; padding: 14px 16px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; }
+.veh-bal-card:hover { border-color: var(--border2); }
+.veh-bal-card.open { border-color: var(--gold); background: rgba(232,160,32,0.03); }
+.vbd-inner { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+.vbd-inner.show { display: block; }
+
+/* ===== USER MANAGEMENT ===== */
+.user-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; display: flex; align-items: center; gap: 16px; margin-bottom: 10px; transition: border-color 0.2s; }
+.user-card:hover { border-color: var(--border2); }
+.user-card-avatar { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 800; color: #000; flex-shrink: 0; }
+.user-card-info { flex: 1; }
+.user-card-name { font-weight: 800; font-size: 0.95rem; }
+.user-card-meta { font-size: 0.77rem; color: var(--text2); margin-top: 3px; }
+.access-chips { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
+.access-chip { padding: 2px 8px; border-radius: 6px; font-size: 0.67rem; font-weight: 700; background: var(--surface3); color: var(--text2); border: 1px solid var(--border); }
+.access-chip.granted { background: rgba(22,199,132,0.1); color: var(--green2); border-color: rgba(22,199,132,0.2); }
+
+/* ===== MODAL ===== */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); z-index: 300; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.modal { background: var(--surface); border: 1px solid var(--border2); border-radius: 20px; padding: 28px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; box-shadow: 0 40px 80px rgba(0,0,0,0.6); animation: fadeUp 0.3s ease; }
+.modal-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+.modal-close { cursor: pointer; color: var(--text3); font-size: 1.4rem; line-height: 1; width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.modal-close:hover { background: var(--surface2); color: var(--text); }
+
+/* ===== PERMISSIONS ===== */
+.perm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 14px 0; }
+.perm-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 9px; cursor: pointer; transition: all 0.15s; }
+.perm-item.checked { background: rgba(22,199,132,0.08); border-color: rgba(22,199,132,0.25); }
+.perm-check { width: 18px; height: 18px; border: 2px solid var(--border2); border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+.perm-item.checked .perm-check { background: var(--green); border-color: var(--green); }
+.perm-check::after { content: '✓'; font-size: 0.7rem; color: #000; font-weight: 800; display: none; }
+.perm-item.checked .perm-check::after { display: block; }
+.perm-label { font-size: 0.82rem; font-weight: 600; color: var(--text2); }
+.perm-item.checked .perm-label { color: var(--text); }
+
+/* ===== TOAST ===== */
+#toastCont { position: fixed; bottom: 22px; right: 22px; z-index: 500; display: flex; flex-direction: column; gap: 8px; }
+.toast { background: var(--surface); border: 1px solid var(--border2); border-radius: 12px; padding: 13px 18px; display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.87rem; box-shadow: 0 12px 40px rgba(0,0,0,0.5); animation: slideR 0.3s ease; min-width: 240px; }
+@keyframes slideR { from { transform: translateX(80px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.toast-success { border-color: rgba(22,199,132,0.4); }
+.toast-error { border-color: rgba(232,64,96,0.4); }
+.toast-info { border-color: rgba(45,126,247,0.4); }
+
+/* ===== MISC ===== */
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+.flex { display: flex; } .gap-2 { gap: 8px; } .gap-3 { gap: 12px; } .fw { flex-wrap: wrap; } .aic { align-items: center; } .jb { justify-content: space-between; }
+.mt-2 { margin-top: 8px; } .mt-3 { margin-top: 14px; } .mt-4 { margin-top: 20px; }
+.text2 { color: var(--text2); font-size: 0.83rem; }
+.text3 { color: var(--text3); font-size: 0.77rem; }
+.fw-800 { font-weight: 800; }
+.empty { text-align: center; padding: 40px 20px; color: var(--text3); }
+.empty .ei { font-size: 3rem; margin-bottom: 12px; opacity: 0.5; }
+.empty p { font-size: 0.9rem; }
+.sum-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+.sc { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; flex: 1; min-width: 110px; }
+.sc .lbl { font-size: 0.68rem; color: var(--text2); text-transform: uppercase; letter-spacing: 0.7px; font-weight: 700; }
+.sc .val { font-size: 1.3rem; font-weight: 800; margin-top: 2px; }
+
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main-content { padding: 16px; }
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .form-grid { grid-template-columns: 1fr; }
+  .vnum-wrap { grid-template-columns: 60px 55px 62px 80px; gap: 5px; }
+  .pass-info-grid { grid-template-columns: 1fr 1fr; }
+  .perm-grid { grid-template-columns: 1fr; }
+  .tb-clock { display: none; }
+  .mobile-nav { display: flex !important; }
+}
+.mobile-nav { display: none; background: var(--surface); border-top: 1px solid var(--border); padding: 8px; gap: 4px; position: fixed; bottom: 0; left: 0; right: 0; z-index: 90; overflow-x: auto; }
+.mn-item { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 10px; border-radius: 8px; cursor: pointer; flex-shrink: 0; font-size: 0.62rem; font-weight: 700; color: var(--text3); }
+.mn-item.active { color: var(--gold); }
+.mn-item .ico { font-size: 1.2rem; }
+</style>
+</head>
+<body>
+
+<!-- ========== LOGIN SCREEN ========== -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="park-icon">🅿</div>
+      <h1>Park<span>Pro</span></h1>
+      <p id="loginSub">Parking Management System</p>
+    </div>
+    <div class="login-err" id="loginErr"></div>
+    <div class="fg" style="margin-bottom:0">
+      <label class="login-label" id="lbl-uid">User ID / Username</label>
+      <input class="login-input" type="text" id="loginUser" placeholder="Enter your ID">
+      <label class="login-label" id="lbl-pass">Password</label>
+      <input class="login-input" type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="login-btn" onclick="doLogin()" id="loginBtnEl">🔐 Login</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== APP SHELL ========== -->
+<div id="appShell">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="tb-logo">
+      <div class="ico">🅿</div>
+      <div class="name">Park<span>Pro</span></div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-clock" id="topClock">--:--:--</div>
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="lbHi" onclick="setLang('hi')">हिंदी</button>
+        <button class="lang-btn" id="lbEn" onclick="setLang('en')">ENG</button>
+      </div>
+      <div class="user-chip" onclick="toggleUserMenu()" id="userChip">
+        <div class="user-avatar" id="topAvatar">A</div>
+        <div>
+          <div class="user-name" id="topName">Admin</div>
+          <div class="user-role" id="topRole">Admin</div>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="umenu-item">👤 <span data-t="profile">Profile</span></div>
+          <div class="divider" style="margin:4px 0"></div>
+          <div class="umenu-item danger" onclick="doLogout()">🚪 <span data-t="logout">Logout</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+      <div class="nav-section">
+        <div class="nav-section-label" data-t="main">Main</div>
+        <div class="nav-item active" data-page="dashboard">
+          <span class="nav-ico">📊</span><span data-t="dashboard">Dashboard</span>
+        </div>
+        <div class="nav-item" data-page="entry" id="nav-entry">
+          <span class="nav-ico">➕</span><span data-t="newEntry">New Entry</span>
+        </div>
+        <div class="nav-item" data-page="records" id="nav-records">
+          <span class="nav-ico">📋</span><span data-t="records">Records</span>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label" data-t="finance">Finance</div>
+        <div class="nav-item" data-page="balance" id="nav-balance">
+          <span class="nav-ico">💰</span><span data-t="balance">Balance</span>
+        </div>
+        <div class="nav-item" data-page="pass" id="nav-pass">
+          <span class="nav-ico">🎫</span><span data-t="passes">Passes</span>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label" data-t="vehicles">Vehicles</div>
+        <div class="nav-item" data-page="holdings" id="nav-holdings">
+          <span class="nav-ico">⏸</span><span data-t="holdings">Holdings</span>
+        </div>
+        <div class="nav-item" data-page="scrap" id="nav-scrap">
+          <span class="nav-ico">🚮</span><span data-t="scrap">Scrap Auto</span>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label" data-t="alerts">Alerts</div>
+        <div class="nav-item" data-page="reminders">
+          <span class="nav-ico">🔔</span><span data-t="reminders">Reminders</span>
+          <span class="nav-badge" id="remBadge" style="display:none">0</span>
+        </div>
+      </div>
+      <div class="nav-section" id="adminNavSection">
+        <div class="nav-section-label" data-t="admin">Admin</div>
+        <div class="nav-item" data-page="users" id="nav-users">
+          <span class="nav-ico">👥</span><span data-t="userManage">User Management</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header">
+          <div class="page-title" data-t="dashTitle">Today's <span data-t="dashTitleSpan">Dashboard</span></div>
+          <div class="page-sub text2" id="dashDate"></div>
+        </div>
+        <div class="stat-grid" id="dashStats"></div>
+        <div class="sum-bar" id="dashTypeSummary"></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title" data-t="todayEntries">Today's <span>Entries</span></div>
+            <span class="text3" id="todayCount"></span>
+          </div>
+          <div class="tbl-wrap">
+            <table><thead><tr><th data-t="type">Type</th><th data-t="vNum">Vehicle No.</th><th data-t="owner">Owner</th><th data-t="dateTime">Date & Time</th><th>₹</th><th data-t="payType">Pay Type</th><th data-t="status">Status</th><th data-t="action">Action</th></tr></thead>
+            <tbody id="todayTbody"></tbody></table>
+          </div>
+        </div>
+        <div id="expPassSection" style="display:none"></div>
+      </div>
+
+      <!-- ENTRY -->
+      <div class="page" id="page-entry">
+        <div class="page-header">
+          <div class="page-title" data-t="newEntry">New <span>Entry</span></div>
+          <div class="page-sub text2" data-t="entrySubtitle">Add a new parking entry</div>
+        </div>
+        <div class="card">
+          <div class="fg" style="margin-bottom:16px">
+            <label data-t="vehType">Vehicle Type</label>
+            <div class="vtype-grid">
+              <div class="vt-btn act-auto" id="vb-auto" onclick="selVT('auto')"><span class="ico">🛺</span><span data-t="auto">Auto</span></div>
+              <div class="vt-btn" id="vb-bike" onclick="selVT('bike')"><span class="ico">🏍️</span><span data-t="bike">Bike</span></div>
+              <div class="vt-btn" id="vb-car" onclick="selVT('car')"><span class="ico">🚗</span><span data-t="car">Car</span></div>
+            </div>
+          </div>
+          <div class="fg" style="margin-bottom:16px">
+            <label data-t="vehNumFull">Vehicle Number (Full)</label>
+            <div class="vnum-wrap">
+              <div class="vnum-part"><input id="vn1" maxlength="2" placeholder="MH" oninput="this.value=this.value.toUpperCase();vnPrev('vn','vnPBox');if(this.value.length==2)document.getElementById('vn2').focus()"><div class="vnum-lbl" data-t="state">State</div></div>
+              <div class="vnum-part"><input id="vn2" maxlength="2" placeholder="12" oninput="vnPrev('vn','vnPBox');if(this.value.length==2)document.getElementById('vn3').focus()"><div class="vnum-lbl">RTO</div></div>
+              <div class="vnum-part"><input id="vn3" maxlength="2" placeholder="AB" oninput="this.value=this.value.toUpperCase();vnPrev('vn','vnPBox');if(this.value.length==2)document.getElementById('vn4').focus()"><div class="vnum-lbl" data-t="series">Series</div></div>
+              <div class="vnum-part"><input id="vn4" maxlength="4" placeholder="1234" oninput="vnPrev('vn','vnPBox')"><div class="vnum-lbl" data-t="number">Number</div></div>
+            </div>
+            <div class="vnum-preview" id="vnPBox">-- -- -- ----</div>
+          </div>
+          <div class="form-grid">
+            <div class="fg"><label data-t="ownerName">Owner Name</label><input id="ownerName" placeholder="Name"></div>
+            <div class="fg"><label data-t="mobile">Mobile</label><input type="tel" id="ownerMob" placeholder="9876543210"></div>
+            <div class="fg"><label data-t="payType">Payment Type</label>
+              <select id="payType" onchange="payTypeChg()">
+                <option value="daily" data-t="daily">Daily</option>
+                <option value="pass" data-t="pass">Pass (Monthly)</option>
+              </select>
+            </div>
+            <div class="fg" id="amtFg"><label data-t="amount">Amount (₹)</label><input type="number" id="entAmt" placeholder="50"></div>
+            <div class="fg" id="passMonFg" style="display:none"><label data-t="passMonths">Pass Months</label>
+              <select id="passMon"><option value="1">1 Month</option><option value="3">3 Months</option><option value="6">6 Months</option><option value="12">1 Year</option></select>
+            </div>
+            <div class="fg" id="passAmtFg" style="display:none"><label data-t="passAmount">Pass Amount (₹)</label><input type="number" id="passAmt" placeholder="500"></div>
+            <div class="fg"><label data-t="payStatus">Payment Status</label>
+              <select id="payStatus"><option value="paid" data-t="paid">Paid ✅</option><option value="unpaid" data-t="unpaid">Pending ❌</option></select>
+            </div>
+          </div>
+          <div class="mt-3 flex gap-2 fw">
+            <button class="btn btn-gold" onclick="addEntry()">✅ <span data-t="saveEntry">Save Entry</span></button>
+            <button class="btn btn-ghost" onclick="clearEF()">🔄 <span data-t="clear">Clear</span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECORDS -->
+      <div class="page" id="page-records">
+        <div class="page-header">
+          <div class="page-title" data-t="allRecords">All <span>Records</span></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="flex gap-2 fw aic">
+              <input id="srchNum" placeholder="🔍 Search vehicle..." oninput="renderRec()" style="background:var(--surface2);border:1.5px solid var(--border);color:var(--text);padding:8px 13px;border-radius:8px;font-family:'Plus Jakarta Sans';font-size:.83rem;width:170px;outline:none;">
+              <select id="fType" onchange="renderRec()" style="background:var(--surface2);border:1.5px solid var(--border);color:var(--text);padding:8px 11px;border-radius:8px;font-family:'Plus Jakarta Sans';font-size:.8rem;outline:none;">
+                <option value="all" data-t="allTypes">All Types</option><option value="auto">Auto</option><option value="bike">Bike</option><option value="car">Car</option>
+              </select>
+              <select id="fStat" onchange="renderRec()" style="background:var(--surface2);border:1.5px solid var(--border);color:var(--text);padding:8px 11px;border-radius:8px;font-family:'Plus Jakarta Sans';font-size:.8rem;outline:none;">
+                <option value="all" data-t="allStatus">All Status</option><option value="unpaid" data-t="pending">Pending</option><option value="paid" data-t="paid">Paid</option>
+              </select>
+              <input type="date" id="fDate" onchange="renderRec()" style="background:var(--surface2);border:1.5px solid var(--border);color:var(--text);padding:8px 11px;border-radius:8px;font-family:'Plus Jakarta Sans';font-size:.8rem;outline:none;">
+            </div>
+          </div>
+          <div class="tbl-wrap">
+            <table><thead><tr><th data-t="dateTime">Date & Time</th><th data-t="type">Type</th><th data-t="vNum">Vehicle No.</th><th data-t="owner">Owner</th><th data-t="mobile">Mobile</th><th data-t="payType">Pay Type</th><th>₹</th><th data-t="status">Status</th><th data-t="action">Action</th></tr></thead>
+            <tbody id="recTbody"></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- BALANCE -->
+      <div class="page" id="page-balance">
+        <div class="page-header">
+          <div class="page-title">💰 <span data-t="balanceDetail">Balance Detail</span></div>
+        </div>
+        <div class="flex gap-2 fw aic" style="margin-bottom:18px">
+          <select id="balMon" onchange="renderBal()" style="background:var(--surface2);border:1.5px solid var(--border);color:var(--text);padding:9px 12px;border-radius:9px;font-family:'Plus Jakarta Sans';font-size:.88rem;outline:none;"></select>
+          <select id="balYr" onchange="renderBal()" style="background:var(--surface2);border:1.5px solid var(--border);color:var(--text);padding:9px 12px;border-radius:9px;font-family:'Plus Jakarta Sans';font-size:.88rem;outline:none;"></select>
+          <button class="btn btn-ghost btn-sm" onclick="setThisMon()" data-t="thisMonth">This Month</button>
+        </div>
+        <div class="stat-grid" id="balStats" style="grid-template-columns:repeat(auto-fit,minmax(145px,1fr))"></div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px" data-t="dayBreakdown">Daily <span>Breakdown</span></div>
+          <div id="balDaily"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title" data-t="vehBalance">Vehicle-wise <span>Balance</span></div>
+            <input id="balVSrch" placeholder="🔍 Search..." oninput="renderBal()" style="background:var(--surface2);border:1.5px solid var(--border);color:var(--text);padding:7px 12px;border-radius:8px;font-family:'Plus Jakarta Sans';font-size:.8rem;outline:none;width:150px;">
+          </div>
+          <div id="balVList"></div>
+        </div>
+      </div>
+
+      <!-- PASS -->
+      <div class="page" id="page-pass">
+        <div class="page-header">
+          <div class="page-title">🎫 <span data-t="passManage">Pass Management</span></div>
+        </div>
+        <div id="passCards"></div>
+      </div>
+
+      <!-- HOLDINGS -->
+      <div class="page" id="page-holdings">
+        <div class="page-header flex jb aic">
+          <div>
+            <div class="page-title">⏸ <span data-t="holdings">Holdings</span></div>
+            <div class="page-sub text2" data-t="holdingSub">Vehicles under hold</div>
+          </div>
+          <button class="btn btn-orange" onclick="showMdl('holdMdl')" id="addHoldBtn">+ <span data-t="newHolding">New Holding</span></button>
+        </div>
+        <div id="holdCards"></div>
+      </div>
+
+      <!-- SCRAP -->
+      <div class="page" id="page-scrap">
+        <div class="page-header flex jb aic">
+          <div>
+            <div class="page-title">🚮 <span data-t="scrapAuto">Scrap Auto</span></div>
+            <div class="page-sub text2" data-t="scrapSub">Scrap vehicle register</div>
+          </div>
+          <button class="btn btn-red" onclick="showMdl('scrapMdl')" id="addScrapBtn">+ <span data-t="scrapEntry">Scrap Entry</span></button>
+        </div>
+        <div class="stat-grid" id="scrapStats" style="grid-template-columns:repeat(auto-fit,minmax(145px,1fr));margin-bottom:16px"></div>
+        <div id="scrapCards"></div>
+      </div>
+
+      <!-- REMINDERS -->
+      <div class="page" id="page-reminders">
+        <div class="page-header">
+          <div class="page-title">🔔 <span data-t="reminders">Reminders</span></div>
+        </div>
+        <div id="remList"></div>
+      </div>
+
+      <!-- USERS -->
+      <div class="page" id="page-users">
+        <div class="page-header flex jb aic">
+          <div>
+            <div class="page-title">👥 <span data-t="userManage">User Management</span></div>
+            <div class="page-sub text2" data-t="userSub">Create and manage user access</div>
+          </div>
+          <button class="btn btn-gold" onclick="showMdl('userMdl')">+ <span data-t="createUser">Create User</span></button>
+        </div>
+        <div id="userCards"></div>
+      </div>
+
+    </div><!-- end main-content -->
+  </div><!-- end app-layout -->
+
+  <!-- Mobile Nav -->
+  <div class="mobile-nav" id="mobileNav">
+    <div class="mn-item active" data-page="dashboard"><span class="ico">📊</span><span data-t="dashboard">Dashboard</span></div>
+    <div class="mn-item" data-page="entry" id="mnav-entry"><span class="ico">➕</span><span data-t="entry">Entry</span></div>
+    <div class="mn-item" data-page="records" id="mnav-records"><span class="ico">📋</span><span data-t="records">Records</span></div>
+    <div class="mn-item" data-page="balance" id="mnav-balance"><span class="ico">💰</span><span data-t="balance">Balance</span></div>
+    <div class="mn-item" data-page="reminders"><span class="ico">🔔</span><span data-t="reminders">Alerts</span></div>
+  </div>
+
+</div><!-- end appShell -->
+
+<!-- HOLDING MODAL -->
+<div class="modal-overlay" id="holdMdl" style="display:none" onclick="if(event.target===this)hideMdl('holdMdl')">
+  <div class="modal">
+    <div class="modal-title"><span>⏸ <span data-t="newHolding">New Holding</span></span><div class="modal-close" onclick="hideMdl('holdMdl')">✕</div></div>
+    <div class="fg" style="margin-bottom:12px"><label data-t="vehType">Vehicle Type</label>
+      <div class="vtype-grid">
+        <div class="vt-btn act-auto" id="hb-auto" onclick="selHT('auto')"><span class="ico">🛺</span>Auto</div>
+        <div class="vt-btn" id="hb-bike" onclick="selHT('bike')"><span class="ico">🏍️</span>Bike</div>
+        <div class="vt-btn" id="hb-car" onclick="selHT('car')"><span class="ico">🚗</span>Car</div>
+      </div>
+    </div>
+    <div class="fg" style="margin-bottom:12px"><label data-t="vehNumFull">Vehicle Number</label>
+      <div class="vnum-wrap">
+        <div class="vnum-part"><input id="hn1" maxlength="2" placeholder="MH" oninput="this.value=this.value.toUpperCase();vnPrev('hn','hnPBox');if(this.value.length==2)document.getElementById('hn2').focus()"><div class="vnum-lbl" data-t="state">State</div></div>
+        <div class="vnum-part"><input id="hn2" maxlength="2" placeholder="12" oninput="vnPrev('hn','hnPBox');if(this.value.length==2)document.getElementById('hn3').focus()"><div class="vnum-lbl">RTO</div></div>
+        <div class="vnum-part"><input id="hn3" maxlength="2" placeholder="AB" oninput="this.value=this.value.toUpperCase();vnPrev('hn','hnPBox');if(this.value.length==2)document.getElementById('hn4').focus()"><div class="vnum-lbl" data-t="series">Series</div></div>
+        <div class="vnum-part"><input id="hn4" maxlength="4" placeholder="1234" oninput="vnPrev('hn','hnPBox')"><div class="vnum-lbl" data-t="number">Number</div></div>
+      </div>
+      <div class="vnum-preview" id="hnPBox">-- -- -- ----</div>
+    </div>
+    <div class="form-grid" style="margin-bottom:12px">
+      <div class="fg"><label data-t="ownerName">Owner Name</label><input id="hOwn" placeholder="Name"></div>
+      <div class="fg"><label data-t="mobile">Mobile</label><input type="tel" id="hMob" placeholder="9876543210"></div>
+      <div class="fg"><label data-t="holdReason">Reason</label><input id="hRsn" placeholder="Why held?"></div>
+      <div class="fg"><label data-t="chargeDay">Charge/Day (₹)</label><input type="number" id="hChg" placeholder="50"></div>
+      <div class="fg"><label data-t="holdDate">Hold Date</label><input type="date" id="hDt"></div>
+    </div>
+    <div class="fg" style="margin-bottom:16px"><label>Note</label><textarea id="hNote" rows="2" placeholder="Any notes..."></textarea></div>
+    <button class="btn btn-orange" onclick="saveHold()">⏸ <span data-t="saveHolding">Save Holding</span></button>
+  </div>
+</div>
+
+<!-- SCRAP MODAL -->
+<div class="modal-overlay" id="scrapMdl" style="display:none" onclick="if(event.target===this)hideMdl('scrapMdl')">
+  <div class="modal">
+    <div class="modal-title"><span>🚮 <span data-t="scrapEntry">Scrap Entry</span></span><div class="modal-close" onclick="hideMdl('scrapMdl')">✕</div></div>
+    <div class="fg" style="margin-bottom:12px"><label data-t="vehNumFull">Vehicle Number</label>
+      <div class="vnum-wrap">
+        <div class="vnum-part"><input id="sn1" maxlength="2" placeholder="MH" oninput="this.value=this.value.toUpperCase();vnPrev('sn','snPBox');if(this.value.length==2)document.getElementById('sn2').focus()"><div class="vnum-lbl" data-t="state">State</div></div>
+        <div class="vnum-part"><input id="sn2" maxlength="2" placeholder="12" oninput="vnPrev('sn','snPBox');if(this.value.length==2)document.getElementById('sn3').focus()"><div class="vnum-lbl">RTO</div></div>
+        <div class="vnum-part"><input id="sn3" maxlength="2" placeholder="AB" oninput="this.value=this.value.toUpperCase();vnPrev('sn','snPBox');if(this.value.length==2)document.getElementById('sn4').focus()"><div class="vnum-lbl" data-t="series">Series</div></div>
+        <div class="vnum-part"><input id="sn4" maxlength="4" placeholder="1234" oninput="vnPrev('sn','snPBox')"><div class="vnum-lbl" data-t="number">Number</div></div>
+      </div>
+      <div class="vnum-preview" id="snPBox">-- -- -- ----</div>
+    </div>
+    <div class="form-grid" style="margin-bottom:16px">
+      <div class="fg"><label data-t="ownerName">Owner Name</label><input id="sOwn" placeholder="Name"></div>
+      <div class="fg"><label data-t="mobile">Mobile</label><input type="tel" id="sMob" placeholder="9876543210"></div>
+      <div class="fg"><label data-t="scrapDate">Scrap Date</label><input type="date" id="sDt"></div>
+      <div class="fg"><label data-t="scrapValue">Scrap Value (₹)</label><input type="number" id="sVal" placeholder="5000"></div>
+      <div class="fg"><label data-t="dealer">Dealer</label><input id="sDlr" placeholder="Dealer name"></div>
+    </div>
+    <div class="fg" style="margin-bottom:16px"><label>Note</label><textarea id="sNote" rows="2" placeholder="Reason..."></textarea></div>
+    <button class="btn btn-red" onclick="saveScrap()">🚮 <span data-t="saveScrap">Save Scrap</span></button>
+  </div>
+</div>
+
+<!-- USER CREATE MODAL -->
+<div class="modal-overlay" id="userMdl" style="display:none" onclick="if(event.target===this)hideMdl('userMdl')">
+  <div class="modal">
+    <div class="modal-title"><span>👤 <span data-t="createUser">Create User</span></span><div class="modal-close" onclick="hideMdl('userMdl')">✕</div></div>
+    <div class="form-grid" style="margin-bottom:14px">
+      <div class="fg"><label data-t="fullName">Full Name</label><input id="uName" placeholder="Name"></div>
+      <div class="fg"><label data-t="userId">User ID</label><input id="uId" placeholder="username123"></div>
+      <div class="fg"><label data-t="password">Password</label><input type="password" id="uPass" placeholder="Set password"></div>
+      <div class="fg"><label data-t="role">Role</label>
+        <select id="uRole">
+          <option value="admin">Admin (Full Access)</option>
+          <option value="operator">Operator</option>
+          <option value="viewer">Viewer (Read Only)</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg" style="margin-bottom:6px"><label data-t="permissions">Permissions / Access</label></div>
+    <div class="perm-grid" id="permGrid">
+      <div class="perm-item checked" data-perm="entry" onclick="togglePerm(this)"><div class="perm-check"></div><span class="perm-label" data-t="newEntry">New Entry</span></div>
+      <div class="perm-item checked" data-perm="records" onclick="togglePerm(this)"><div class="perm-check"></div><span class="perm-label" data-t="records">Records</span></div>
+      <div class="perm-item checked" data-perm="balance" onclick="togglePerm(this)"><div class="perm-check"></div><span class="perm-label" data-t="balance">Balance</span></div>
+      <div class="perm-item checked" data-perm="pass" onclick="togglePerm(this)"><div class="perm-check"></div><span class="perm-label" data-t="passes">Passes</span></div>
+      <div class="perm-item checked" data-perm="holdings" onclick="togglePerm(this)"><div class="perm-check"></div><span class="perm-label" data-t="holdings">Holdings</span></div>
+      <div class="perm-item checked" data-perm="scrap" onclick="togglePerm(this)"><div class="perm-check"></div><span class="perm-label" data-t="scrapAuto">Scrap Auto</span></div>
+      <div class="perm-item" data-perm="users" onclick="togglePerm(this)"><div class="perm-check"></div><span class="perm-label" data-t="userManage">User Manage</span></div>
+      <div class="perm-item checked" data-perm="reminders" onclick="togglePerm(this)"><div class="perm-check"></div><span class="perm-label" data-t="reminders">Reminders</span></div>
+    </div>
+    <div class="mt-3"><button class="btn btn-gold" onclick="createUser()">✅ <span data-t="createUser">Create User</span></button></div>
+  </div>
+</div>
+
+<!-- EDIT ENTRY MODAL -->
+<div class="modal-overlay" id="editMdl" style="display:none" onclick="if(event.target===this)hideMdl('editMdl')">
+  <div class="modal">
+    <div class="modal-title">
+      <span>&#9999;&#65039; <span id="editMdlTitle">Edit Entry</span></span>
+      <div class="modal-close" onclick="hideMdl('editMdl')">&#10005;</div>
+    </div>
+    <div class="fg" style="margin-bottom:12px">
+      <label id="el-vtype">Vehicle Type</label>
+      <div class="vtype-grid">
+        <div class="vt-btn act-auto" id="eb-auto" onclick="selET('auto')"><span class="ico">&#128250;</span>Auto</div>
+        <div class="vt-btn" id="eb-bike" onclick="selET('bike')"><span class="ico">&#128717;&#65039;</span>Bike</div>
+        <div class="vt-btn" id="eb-car" onclick="selET('car')"><span class="ico">&#128663;</span>Car</div>
+      </div>
+    </div>
+    <div class="fg" style="margin-bottom:12px">
+      <label id="el-vnum">Vehicle Number</label>
+      <div class="vnum-wrap">
+        <div class="vnum-part"><input id="en1" maxlength="2" placeholder="MH" oninput="this.value=this.value.toUpperCase();vnPrev('en','enPBox');if(this.value.length==2)document.getElementById('en2').focus()"><div class="vnum-lbl">State</div></div>
+        <div class="vnum-part"><input id="en2" maxlength="2" placeholder="12" oninput="vnPrev('en','enPBox');if(this.value.length==2)document.getElementById('en3').focus()"><div class="vnum-lbl">RTO</div></div>
+        <div class="vnum-part"><input id="en3" maxlength="2" placeholder="AB" oninput="this.value=this.value.toUpperCase();vnPrev('en','enPBox');if(this.value.length==2)document.getElementById('en4').focus()"><div class="vnum-lbl">Series</div></div>
+        <div class="vnum-part"><input id="en4" maxlength="4" placeholder="1234" oninput="vnPrev('en','enPBox')"><div class="vnum-lbl">Number</div></div>
+      </div>
+      <div class="vnum-preview" id="enPBox">-- -- -- ----</div>
+    </div>
+    <div class="form-grid" style="margin-bottom:14px">
+      <div class="fg"><label id="el-owner">Owner Name</label><input id="eOwner" placeholder="Name"></div>
+      <div class="fg"><label id="el-mob">Mobile</label><input type="tel" id="eMob" placeholder="9876543210"></div>
+      <div class="fg">
+        <label id="el-paytype">Payment Type</label>
+        <select id="ePayType" onchange="editPayTypeChg()">
+          <option value="daily">Daily</option>
+          <option value="pass">Pass</option>
+        </select>
+      </div>
+      <div class="fg" id="eAmtFg">
+        <label id="el-amt">Amount (Rs.)</label>
+        <input type="number" id="eAmt" placeholder="50">
+      </div>
+      <div class="fg">
+        <label id="el-status">Payment Status</label>
+        <select id="ePayStatus">
+          <option value="paid">Paid</option>
+          <option value="unpaid">Pending</option>
+        </select>
+      </div>
+    </div>
+    <div style="background:rgba(45,126,247,0.08);border:1px solid rgba(45,126,247,0.2);border-radius:9px;padding:10px 14px;margin-bottom:16px;font-size:.8rem;color:var(--blue2)">
+      <span id="editInfoText">Original entry date and time will be preserved. Only details will change.</span>
+    </div>
+    <input type="hidden" id="editEntryId">
+    <div class="flex gap-2">
+      <button class="btn btn-gold" onclick="saveEditEntry()">Save Changes</button>
+      <button class="btn btn-ghost" onclick="hideMdl('editMdl')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="toastCont"></div>
+
+<script>
+// ==================== SUPABASE CONFIG ====================
+const SUPA_URL = 'https://riayyjcimsivlyqndigu.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpYXl5amNpbXNpdmx5cW5kaWd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MDQ1ODIsImV4cCI6MjA4ODM4MDU4Mn0.qZJl5VkT7LWhOVsvAlx8jLbDqqQrHIwedjb0gxKQv4A';
+
+const SB = {
+  h: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY },
+  async get(table, filter='') {
+    try {
+      const r = await fetch(`${SUPA_URL}/rest/v1/${table}?${filter}&order=created_at.asc`, { headers: this.h });
+      return r.ok ? r.json() : [];
+    } catch(e) { return []; }
+  },
+  async insert(table, data) {
+    try {
+      const r = await fetch(`${SUPA_URL}/rest/v1/${table}`, {
+        method: 'POST', headers: { ...this.h, 'Prefer': 'return=minimal' },
+        body: JSON.stringify(data)
+      });
+      return r.ok;
+    } catch(e) { return false; }
+  },
+  async update(table, id, data) {
+    try {
+      const r = await fetch(`${SUPA_URL}/rest/v1/${table}?id=eq.${id}`, {
+        method: 'PATCH', headers: { ...this.h, 'Prefer': 'return=minimal' },
+        body: JSON.stringify(data)
+      });
+      return r.ok;
+    } catch(e) { return false; }
+  },
+  async del(table, id) {
+    try {
+      const r = await fetch(`${SUPA_URL}/rest/v1/${table}?id=eq.${id}`, {
+        method: 'DELETE', headers: this.h
+      });
+      return r.ok;
+    } catch(e) { return false; }
+  }
+};
+
+// ==================== DATA ====================
+let D = { entries: [], passes: [], holdings: [], scraps: [] };
+let USERS = [];
+let ctr = parseInt(localStorage.getItem('pp_ctr') || '1');
+let lang = localStorage.getItem('pp_lang') || 'hi';
+let currentUser = null;
+let svt = 'auto', sht = 'auto';
+
+function showLoader(msg) {
+  let el = document.getElementById('gLoader');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'gLoader';
+    el.style.cssText = 'position:fixed;inset:0;background:rgba(5,11,20,0.9);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;backdrop-filter:blur(6px);';
+    el.innerHTML = '<div style="width:48px;height:48px;border:3px solid rgba(232,160,32,0.2);border-top-color:#e8a020;border-radius:50%;animation:gSpin 0.8s linear infinite"></div><div id="gLoaderMsg" style="color:#e8a020;font-weight:700;font-size:1rem"></div><style>@keyframes gSpin{to{transform:rotate(360deg)}}</style>';
+    document.body.appendChild(el);
+  }
+  document.getElementById('gLoaderMsg').textContent = msg || (lang==='hi' ? 'लोड हो रहा है...' : 'Loading...');
+  el.style.display = 'flex';
+}
+function hideLoader() { const el=document.getElementById('gLoader'); if(el) el.style.display='none'; }
+
+async function loadAllData() {
+  showLoader(lang==='hi' ? 'डेटा लोड हो रहा है...' : 'Loading data...');
+  try {
+    const [entries, passes, holdings, scraps, users] = await Promise.all([
+      SB.get('entries'), SB.get('passes'), SB.get('holdings'), SB.get('scraps'), SB.get('users')
+    ]);
+    D.entries = (entries||[]).map(e => ({
+      id:e.id, date:e.date, time:e.time||e.created_at, type:e.type,
+      vehicleNum:e.vehicle_num, owner:e.owner, mobile:e.mobile,
+      payType:e.pay_type, payStatus:e.pay_status, amount:parseFloat(e.amount)||0,
+      passId:e.pass_id, addedBy:e.added_by
+    }));
+    D.passes = (passes||[]).map(p => ({
+      id:p.id, vehicleNum:p.vehicle_num, owner:p.owner, mobile:p.mobile,
+      type:p.type, months:p.months, amount:parseFloat(p.amount)||0,
+      startDate:p.start_date, expiryDate:p.expiry_date, status:p.status,
+      addedBy:p.added_by, createdAt:p.created_at
+    }));
+    D.holdings = (holdings||[]).map(h => ({
+      id:h.id, vehicleNum:h.vehicle_num, owner:h.owner, mobile:h.mobile,
+      type:h.type, reason:h.reason, chargePerDay:parseFloat(h.charge_per_day)||0,
+      holdDate:h.hold_date, note:h.note, status:h.status,
+      releaseDate:h.release_date, addedBy:h.added_by, createdAt:h.created_at
+    }));
+    D.scraps = (scraps||[]).map(s => ({
+      id:s.id, vehicleNum:s.vehicle_num, owner:s.owner, mobile:s.mobile,
+      scrapDate:s.scrap_date, scrapValue:parseFloat(s.scrap_value)||0,
+      dealer:s.dealer, note:s.note, addedBy:s.added_by, createdAt:s.created_at
+    }));
+    USERS = (users||[]).map(u => ({
+      id:u.id, name:u.name, password:u.password, role:u.role, color:u.color,
+      permissions: Array.isArray(u.permissions) ? u.permissions : JSON.parse(u.permissions||'[]'),
+      createdAt:u.created_at
+    }));
+  } catch(e) {
+    console.error('Load error:', e);
+    toast(lang==='hi' ? '⚠️ डेटा लोड नहीं हुआ, इंटरनेट चेक करें' : '⚠️ Failed to load data', 'error');
+  }
+  hideLoader();
+}
+
+function saveData() { localStorage.setItem('pp_ctr', ctr); }
+function saveUsers() {}
+
+// ==================== TRANSLATIONS ====================
+const T = {
+  hi: {
+    dashboard:'डैशबोर्ड', dashTitle:'आज का', dashTitleSpan:'डैशबोर्ड',
+    newEntry:'नई एंट्री', records:'सभी रिकॉर्ड', allRecords:'सभी',
+    balance:'बैलेंस', balanceDetail:'बैलेंस डिटेल',
+    passes:'पास', passManage:'पास मैनेजमेंट',
+    holdings:'होल्डिंग', holdingSub:'रोकी गई गाड़ियाँ',
+    scrap:'स्क्रैप', scrapAuto:'स्क्रैप ऑटो', scrapSub:'स्क्रैप रजिस्टर',
+    reminders:'रिमाइंडर', admin:'एडमिन', userManage:'यूज़र मैनेजमेंट', userSub:'यूज़र बनाएं और एक्सेस दें',
+    main:'मुख्य', finance:'वित्त', vehicles:'गाड़ियाँ', alerts:'अलर्ट',
+    type:'प्रकार', vNum:'गाड़ी नंबर', owner:'मालिक', dateTime:'दिनांक & समय',
+    payType:'भुगतान प्रकार', status:'स्थिति', action:'कार्य', mobile:'मोबाइल',
+    vehType:'गाड़ी का प्रकार', vehNumFull:'गाड़ी नंबर (पूरा)', ownerName:'मालिक का नाम',
+    amount:'राशि (₹)', passMonths:'पास महीने', passAmount:'पास राशि', payStatus:'भुगतान स्थिति',
+    saveEntry:'एंट्री सेव करें', clear:'साफ़ करें',
+    auto:'ऑटो', bike:'बाइक', car:'कार',
+    paid:'पेड ✅', unpaid:'बाकी ❌', daily:'डेली', pass:'पास',
+    thisMonth:'इस महीने', dayBreakdown:'दिन के अनुसार', vehBalance:'गाड़ी के अनुसार',
+    state:'राज्य', series:'सीरीज़', number:'नंबर',
+    newHolding:'नई होल्डिंग', saveHolding:'होल्डिंग सेव', holdReason:'वजह',
+    chargeDay:'चार्ज/दिन (₹)', holdDate:'होल्ड तारीख',
+    scrapEntry:'स्क्रैप एंट्री', scrapDate:'स्क्रैप तारीख', scrapValue:'स्क्रैप मूल्य', dealer:'डीलर', saveScrap:'स्क्रैप सेव',
+    createUser:'यूज़र बनाएं', fullName:'पूरा नाम', userId:'यूज़र ID', password:'पासवर्ड', role:'भूमिका', permissions:'अनुमतियाँ',
+    profile:'प्रोफाइल', logout:'लॉगआउट',
+    entrySubtitle:'नई पार्किंग एंट्री जोड़ें',
+    allTypes:'सब प्रकार', allStatus:'सब', pending:'बाकी'
+  },
+  en: {
+    dashboard:'Dashboard', dashTitle:"Today's", dashTitleSpan:'Dashboard',
+    newEntry:'New Entry', records:'All Records', allRecords:'All',
+    balance:'Balance', balanceDetail:'Balance Detail',
+    passes:'Passes', passManage:'Pass Management',
+    holdings:'Holdings', holdingSub:'Vehicles under hold',
+    scrap:'Scrap', scrapAuto:'Scrap Auto', scrapSub:'Scrap vehicle register',
+    reminders:'Reminders', admin:'Admin', userManage:'User Management', userSub:'Create & manage user access',
+    main:'Main', finance:'Finance', vehicles:'Vehicles', alerts:'Alerts',
+    type:'Type', vNum:'Vehicle No.', owner:'Owner', dateTime:'Date & Time',
+    payType:'Pay Type', status:'Status', action:'Action', mobile:'Mobile',
+    vehType:'Vehicle Type', vehNumFull:'Vehicle Number (Full)', ownerName:'Owner Name',
+    amount:'Amount (₹)', passMonths:'Pass Months', passAmount:'Pass Amount', payStatus:'Payment Status',
+    saveEntry:'Save Entry', clear:'Clear',
+    auto:'Auto', bike:'Bike', car:'Car',
+    paid:'Paid ✅', unpaid:'Pending ❌', daily:'Daily', pass:'Pass',
+    thisMonth:'This Month', dayBreakdown:'Daily Breakdown', vehBalance:'Vehicle-wise Balance',
+    state:'State', series:'Series', number:'Number',
+    newHolding:'New Holding', saveHolding:'Save Holding', holdReason:'Reason',
+    chargeDay:'Charge/Day (₹)', holdDate:'Hold Date',
+    scrapEntry:'Scrap Entry', scrapDate:'Scrap Date', scrapValue:'Scrap Value', dealer:'Dealer', saveScrap:'Save Scrap',
+    createUser:'Create User', fullName:'Full Name', userId:'User ID', password:'Password', role:'Role', permissions:'Permissions',
+    profile:'Profile', logout:'Logout',
+    entrySubtitle:'Add a new parking entry',
+    allTypes:'All Types', allStatus:'All Status', pending:'Pending'
+  }
+};
+
+function t(key) { return T[lang][key] || key; }
+
+function setLang(l) {
+  lang = l; localStorage.setItem('pp_lang', l);
+  document.getElementById('lbHi').classList.toggle('active', l === 'hi');
+  document.getElementById('lbEn').classList.toggle('active', l === 'en');
+  applyLang();
+  // Re-render the currently active page
+  const activePage = document.querySelector('.page.active');
+  if (activePage) {
+    const pid = activePage.id.replace('page-','');
+    if(pid==='dashboard') renderDash();
+    else if(pid==='records') renderRec();
+    else if(pid==='balance') renderBal();
+    else if(pid==='pass') renderPass();
+    else if(pid==='holdings') renderHold();
+    else if(pid==='scrap') renderScrap();
+    else if(pid==='reminders') renderRem();
+    else if(pid==='users') renderUsers();
+  }
+  // Update clock locale
+  updateClock();
+  // Update top date
+  document.getElementById('dashDate').textContent = new Date().toLocaleDateString(lang==='hi'?'hi-IN':'en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+}
+
+function applyLang() {
+  document.querySelectorAll('[data-t]').forEach(el => {
+    const key = el.getAttribute('data-t');
+    if (T[lang][key]) el.textContent = T[lang][key];
+  });
+  // Update static hardcoded text areas
+  const selects = {
+    'fType': [['all', lang==='hi'?'सब प्रकार':'All Types'],['auto','Auto'],['bike','Bike'],['car','Car']],
+    'fStat': [['all', lang==='hi'?'सब':'All Status'],['unpaid', lang==='hi'?'बाकी':'Pending'],['paid', lang==='hi'?'पेड':'Paid']],
+    'payStatus': [['paid', lang==='hi'?'पेड ✅':'Paid ✅'],['unpaid', lang==='hi'?'बाकी ❌':'Pending ❌']],
+    'payType': [['daily', lang==='hi'?'डेली (रोज़)':'Daily'],['pass', lang==='hi'?'पास (मंथली)':'Pass (Monthly)']]
+  };
+  Object.entries(selects).forEach(([id, opts]) => {
+    const el = document.getElementById(id); if (!el) return;
+    const cur = el.value;
+    el.innerHTML = opts.map(([v,t]) => `<option value="${v}">${t}</option>`).join('');
+    el.value = cur;
+  });
+}
+
+// ==================== UTILS ====================
+function today() { return new Date().toISOString().split('T')[0]; }
+function fmtDate(d) { if(!d) return '-'; return new Date(d+'T00:00:00').toLocaleDateString(lang==='hi'?'hi-IN':'en-IN',{day:'2-digit',month:'short',year:'numeric'}); }
+function fmtTime(iso) { if(!iso) return ''; return new Date(iso).toLocaleTimeString(lang==='hi'?'hi-IN':'en-IN',{hour:'2-digit',minute:'2-digit',hour12:true}); }
+function fmtDT(iso) { if(!iso) return '-'; const d=new Date(iso); return d.toLocaleDateString(lang==='hi'?'hi-IN':'en-IN',{day:'2-digit',month:'short',year:'numeric'})+'<br><span class="td-time">'+d.toLocaleTimeString(lang==='hi'?'hi-IN':'en-IN',{hour:'2-digit',minute:'2-digit',hour12:true})+'</span>'; }
+function addD(date,n) { const d=new Date(date+'T00:00:00'); d.setDate(d.getDate()+n); return d.toISOString().split('T')[0]; }
+function dBet(a,b) { return Math.floor((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000); }
+function ti(t) { return t==='auto'?'🛺':t==='bike'?'🏍️':'🚗'; }
+function gvn(p) { return ['1','2','3','4'].map(i=>document.getElementById(p+i).value.toUpperCase().trim()).join(' ').trim(); }
+function hasPerm(p) { return currentUser && (currentUser.role==='admin' || currentUser.permissions.includes(p)); }
+
+function toast(msg, type='success') {
+  const c=document.getElementById('toastCont'); const d=document.createElement('div');
+  d.className=`toast toast-${type}`; d.innerHTML=`<span>${type==='success'?'✅':type==='error'?'❌':'ℹ️'}</span>${msg}`;
+  c.appendChild(d); setTimeout(()=>{ d.style.opacity='0'; d.style.transform='translateX(80px)'; d.style.transition='all 0.3s'; setTimeout(()=>d.remove(),300); },3000);
+}
+
+// ==================== CLOCK ====================
+function updateClock() {
+  const now = new Date();
+  document.getElementById('topClock').textContent = now.toLocaleTimeString(lang==='hi'?'hi-IN':'en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});
+}
+setInterval(updateClock, 1000);
+
+// ==================== LOGIN ====================
+async function doLogin() {
+  const uid = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const loginBtn = document.getElementById('loginBtnEl');
+  loginBtn.textContent = lang==='hi' ? '⏳ लॉगिन हो रहा है...' : '⏳ Logging in...';
+  loginBtn.disabled = true;
+  // Load users from Supabase
+  try {
+    const users = await SB.get('users');
+    USERS = (users||[]).map(u => ({
+      id:u.id, name:u.name, password:u.password, role:u.role, color:u.color,
+      permissions: Array.isArray(u.permissions) ? u.permissions : JSON.parse(u.permissions||'[]'),
+      createdAt:u.created_at
+    }));
+  } catch(e) { console.error(e); }
+  loginBtn.textContent = lang==='hi' ? '🔐 लॉगिन' : '🔐 Login';
+  loginBtn.disabled = false;
+  const user = USERS.find(u => (u.id===uid || u.username===uid) && u.password===pass);
+  if (!user) {
+    const el = document.getElementById('loginErr');
+    el.style.display='block';
+    el.textContent = lang==='hi' ? '❌ गलत ID या पासवर्ड' : '❌ Wrong ID or Password';
+    return;
+  }
+  currentUser = user;
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appShell').style.display = 'block';
+  await loadAllData();
+  initApp();
+}
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('appShell').style.display = 'none';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginErr').style.display = 'none';
+  document.getElementById('userMenu').classList.remove('show');
+}
+
+function initApp() {
+  // Avatar
+  const colors = ['#e8a020','#2d7ef7','#16c784','#7c5af7','#f07830'];
+  const ci = USERS.indexOf(USERS.find(u=>u.id===currentUser.id)) % colors.length;
+  const col = colors[ci];
+  document.getElementById('topAvatar').style.background = col;
+  document.getElementById('topAvatar').textContent = (currentUser.name||'A')[0].toUpperCase();
+  document.getElementById('topName').textContent = currentUser.name;
+  document.getElementById('topRole').textContent = currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1);
+  // Permissions - hide nav items
+  const permMap = { entry:'nav-entry', records:'nav-records', balance:'nav-balance', pass:'nav-pass', holdings:'nav-holdings', scrap:'nav-scrap', users:'nav-users' };
+  Object.entries(permMap).forEach(([perm,navId]) => {
+    const el = document.getElementById(navId);
+    if (el) el.style.display = hasPerm(perm) ? '' : 'none';
+  });
+  document.getElementById('adminNavSection').style.display = hasPerm('users') ? '' : 'none';
+  // Hide add buttons for viewers
+  if (!hasPerm('entry')) { const ab=document.getElementById('addHoldBtn'); if(ab) ab.style.display='none'; const sb=document.getElementById('addScrapBtn'); if(sb) sb.style.display='none'; }
+  setLang(lang);
+  renderDash();
+  updateRB();
+  initBalSel();
+}
+
+// ==================== NAV ====================
+function showPage(name) {
+  if (!hasPerm(name) && name !== 'dashboard' && name !== 'reminders') { toast(lang==='hi'?'इस पेज का एक्सेस नहीं है':'Access denied for this page','error'); return; }
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item, .mn-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll(`[data-page="${name}"]`).forEach(el=>el.classList.add('active'));
+  if(name==='dashboard') renderDash();
+  if(name==='records') renderRec();
+  if(name==='balance') renderBal();
+  if(name==='pass') renderPass();
+  if(name==='holdings') renderHold();
+  if(name==='scrap') renderScrap();
+  if(name==='reminders') renderRem();
+  if(name==='users') renderUsers();
+}
+
+document.querySelectorAll('.nav-item[data-page], .mn-item[data-page]').forEach(el => {
+  el.addEventListener('click', function() { showPage(this.dataset.page); });
+});
+
+// ==================== USER MENU ====================
+function toggleUserMenu() { document.getElementById('userMenu').classList.toggle('show'); }
+document.addEventListener('click', e => { if (!e.target.closest('#userChip')) document.getElementById('userMenu').classList.remove('show'); });
+
+// ==================== MODALS ====================
+function showMdl(id) { document.getElementById(id).style.display='flex'; }
+function hideMdl(id) { document.getElementById(id).style.display='none'; }
+
+// ==================== VN PREVIEW ====================
+function vnPrev(pfx, outId) {
+  const v=['1','2','3','4'].map(i=>document.getElementById(pfx+i).value.toUpperCase()).filter(x=>x).join(' ');
+  document.getElementById(outId).textContent = v || '-- -- -- ----';
+}
+
+// ==================== VEHICLE TYPE ====================
+function selVT(t) {
+  svt=t; ['auto','bike','car'].forEach(x=>{document.getElementById('vb-'+x).className='vt-btn';});
+  document.getElementById('vb-'+t).className=`vt-btn act-${t}`;
+  const def={auto:30,bike:20,car:50}; document.getElementById('entAmt').value=def[t];
+}
+selVT('auto');
+
+function selHT(t) {
+  sht=t; ['auto','bike','car'].forEach(x=>{document.getElementById('hb-'+x).className='vt-btn';});
+  document.getElementById('hb-'+t).className=`vt-btn act-${t}`;
+}
+selHT('auto');
+
+function payTypeChg() {
+  const ip=document.getElementById('payType').value==='pass';
+  document.getElementById('amtFg').style.display=ip?'none':'';
+  document.getElementById('passMonFg').style.display=ip?'':'none';
+  document.getElementById('passAmtFg').style.display=ip?'':'none';
+  if(ip) document.getElementById('payStatus').value='paid';
+}
+
+// ==================== ADD ENTRY ====================
+async function addEntry() {
+  if(!hasPerm('entry')){ toast(lang==='hi'?'एंट्री का एक्सेस नहीं है':'No permission to add entry','error'); return; }
+  const num=gvn('vn'); const own=document.getElementById('ownerName').value.trim(); const mob=document.getElementById('ownerMob').value.trim();
+  const pt=document.getElementById('payType').value; const ps=document.getElementById('payStatus').value;
+  if(!num||num.replace(/\s/g,'').length<4){toast(lang==='hi'?'गाड़ी नंबर पूरा लिखें!':'Enter complete vehicle number!','error');return;}
+  if(!own){toast(lang==='hi'?'मालिक का नाम ज़रूरी है!':'Owner name is required!','error');return;}
+  const now = new Date().toISOString();
+  const eid = 'E'+ctr++;
+  const entry={id:eid,date:today(),time:now,type:svt,vehicleNum:num,owner:own,mobile:mob,payType:pt,payStatus:ps,amount:0,passId:null,addedBy:currentUser.id};
+  showLoader(lang==='hi'?'सेव हो रहा है...':'Saving...');
+  if(pt==='pass'){
+    const mo=parseInt(document.getElementById('passMon').value); const amt=parseFloat(document.getElementById('passAmt').value)||0;
+    const pid='P'+ctr++; const exp=addD(today(),mo*30);
+    const passRow={id:pid,vehicle_num:num,owner:own,mobile:mob,type:svt,months:mo,amount:amt,start_date:today(),expiry_date:exp,status:'active',added_by:currentUser.id,created_at:now};
+    await SB.insert('passes', passRow);
+    D.passes.push({id:pid,vehicleNum:num,owner:own,mobile:mob,type:svt,months:mo,amount:amt,startDate:today(),expiryDate:exp,status:'active',addedBy:currentUser.id,createdAt:now});
+    entry.passId=pid; entry.amount=amt;
+  } else { entry.amount=parseFloat(document.getElementById('entAmt').value)||0; }
+  const eRow={id:eid,date:entry.date,time:entry.time,type:entry.type,vehicle_num:num,owner:own,mobile:mob,pay_type:pt,pay_status:ps,amount:entry.amount,pass_id:entry.passId,added_by:currentUser.id,created_at:now};
+  const ok = await SB.insert('entries', eRow);
+  hideLoader();
+  if(ok){ D.entries.push(entry); saveData(); clearEF(); renderDash(); updateRB(); toast(lang==='hi'?`✅ एंट्री सेव: ${num}`:`✅ Entry saved: ${num}`); }
+  else { ctr--; toast(lang==='hi'?'❌ सेव नहीं हुआ, दोबारा कोशिश करें':'❌ Save failed, try again','error'); }
+}
+
+function clearEF() {
+  ['vn1','vn2','vn3','vn4'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('vnPBox').textContent='-- -- -- ----';
+  ['ownerName','ownerMob','entAmt','passAmt'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('payType').value='daily'; document.getElementById('payStatus').value='paid';
+  document.getElementById('amtFg').style.display=''; document.getElementById('passMonFg').style.display='none'; document.getElementById('passAmtFg').style.display='none';
+  selVT('auto');
+}
+
+async function markPaid(id) {
+  if(!hasPerm('entry')){ toast('No permission','error'); return; }
+  const e=D.entries.find(x=>x.id===id); if(!e) return;
+  showLoader(lang==='hi'?'अपडेट हो रहा है...':'Updating...');
+  const ok = await SB.update('entries', id, {pay_status:'paid'});
+  hideLoader();
+  if(ok){ e.payStatus='paid'; renderDash(); renderRec(); renderBal(); updateRB(); toast(lang==='hi'?'✅ पेमेंट हो गई!':'✅ Payment marked!'); }
+  else { toast('Update failed','error'); }
+}
+async function delEntry(id) {
+  if(!hasPerm('entry')){ toast('No permission','error'); return; }
+  if(!confirm(lang==='hi'?'इस एंट्री को डिलीट करें?':'Delete this entry?')) return;
+  showLoader(lang==='hi'?'डिलीट हो रहा है...':'Deleting...');
+  const ok = await SB.del('entries', id);
+  hideLoader();
+  if(ok){ D.entries=D.entries.filter(x=>x.id!==id); renderDash(); renderRec(); renderBal(); updateRB(); toast(lang==='hi'?'डिलीट हो गई':'Entry deleted','info'); }
+  else { toast('Delete failed','error'); }
+}
+
+// ==================== EDIT ENTRY ====================
+let editVType = 'auto';
+
+function selET(t) {
+  editVType = t;
+  ['auto','bike','car'].forEach(x=>{ document.getElementById('eb-'+x).className='vt-btn'; });
+  document.getElementById('eb-'+t).className = `vt-btn act-${t}`;
+}
+
+function editPayTypeChg() {
+  const isPass = document.getElementById('ePayType').value === 'pass';
+  document.getElementById('eAmtFg').style.display = isPass ? 'none' : '';
+}
+
+function openEditEntry(id) {
+  if(!hasPerm('entry')){ toast(lang==='hi'?'एक्सेस नहीं':'No permission','error'); return; }
+  const e = D.entries.find(x=>x.id===id);
+  if(!e) return;
+  // Set title
+  document.getElementById('editMdlTitle').textContent = lang==='hi' ? 'एंट्री एडिट करें' : 'Edit Entry';
+  document.getElementById('editInfoText').textContent = lang==='hi'
+    ? 'एंट्री की तारीख और समय वैसा ही रहेगा। सिर्फ बाकी जानकारी बदलेगी।'
+    : 'Original entry date & time will be preserved. Only details will change.';
+  document.getElementById('el-save').textContent = lang==='hi' ? 'बदलाव सेव करें' : 'Save Changes';
+  // Fill vehicle number parts
+  const parts = e.vehicleNum.split(' ');
+  document.getElementById('en1').value = parts[0]||'';
+  document.getElementById('en2').value = parts[1]||'';
+  document.getElementById('en3').value = parts[2]||'';
+  document.getElementById('en4').value = parts[3]||'';
+  document.getElementById('enPBox').textContent = e.vehicleNum;
+  // Fill other fields
+  document.getElementById('eOwner').value = e.owner||'';
+  document.getElementById('eMob').value = e.mobile||'';
+  document.getElementById('ePayType').value = e.payType||'daily';
+  document.getElementById('eAmt').value = e.amount||0;
+  document.getElementById('ePayStatus').value = e.payStatus||'paid';
+  document.getElementById('eAmtFg').style.display = e.payType==='pass' ? 'none' : '';
+  document.getElementById('editEntryId').value = id;
+  // Set vehicle type
+  editVType = e.type||'auto';
+  selET(editVType);
+  // Update labels for current lang
+  document.getElementById('el-vtype').textContent = lang==='hi' ? 'गाड़ी का प्रकार' : 'Vehicle Type';
+  document.getElementById('el-vnum').textContent = lang==='hi' ? 'गाड़ी नंबर' : 'Vehicle Number';
+  document.getElementById('el-owner').textContent = lang==='hi' ? 'मालिक का नाम' : 'Owner Name';
+  document.getElementById('el-mob').textContent = lang==='hi' ? 'मोबाइल' : 'Mobile';
+  document.getElementById('el-paytype').textContent = lang==='hi' ? 'भुगतान प्रकार' : 'Payment Type';
+  document.getElementById('el-amt').textContent = lang==='hi' ? 'राशि (₹)' : 'Amount (₹)';
+  document.getElementById('el-status').textContent = lang==='hi' ? 'भुगतान स्थिति' : 'Payment Status';
+  // Update select options for lang
+  document.getElementById('ePayType').innerHTML = lang==='hi'
+    ? `<option value="daily">डेली</option><option value="pass">पास</option>`
+    : `<option value="daily">Daily</option><option value="pass">Pass</option>`;
+  document.getElementById('ePayType').value = e.payType||'daily';
+  document.getElementById('ePayStatus').innerHTML = lang==='hi'
+    ? `<option value="paid">पेड ✅</option><option value="unpaid">बाकी ❌</option>`
+    : `<option value="paid">Paid ✅</option><option value="unpaid">Pending ❌</option>`;
+  document.getElementById('ePayStatus').value = e.payStatus||'paid';
+
+  showMdl('editMdl');
+}
+
+async function saveEditEntry() {
+  const id = document.getElementById('editEntryId').value;
+  const e = D.entries.find(x=>x.id===id);
+  if(!e){ toast('Entry not found','error'); return; }
+  const parts = ['en1','en2','en3','en4'].map(i=>document.getElementById(i).value.toUpperCase().trim());
+  const num = parts.join(' ').trim();
+  const own = document.getElementById('eOwner').value.trim();
+  if(!num||num.replace(/\s/g,'').length<4){ toast(lang==='hi'?'गाड़ी नंबर पूरा लिखें!':'Enter complete vehicle number!','error'); return; }
+  if(!own){ toast(lang==='hi'?'नाम ज़रूरी है!':'Name is required!','error'); return; }
+  // Update entry — preserve original time/date
+  const newMob = document.getElementById('eMob').value.trim();
+  const newPayType = document.getElementById('ePayType').value;
+  const newPayStatus = document.getElementById('ePayStatus').value;
+  const newAmt = newPayType !== 'pass' ? (parseFloat(document.getElementById('eAmt').value)||0) : e.amount;
+  showLoader(lang==='hi'?'अपडेट हो रहा है...':'Updating...');
+  const ok = await SB.update('entries', id, {
+    vehicle_num:num, owner:own, mobile:newMob, type:editVType,
+    pay_type:newPayType, pay_status:newPayStatus, amount:newAmt
+  });
+  hideLoader();
+  if(!ok){ toast('Update failed','error'); return; }
+  e.vehicleNum=num; e.owner=own; e.mobile=newMob; e.type=editVType;
+  e.payType=newPayType; e.payStatus=newPayStatus; e.amount=newAmt;
+  hideMdl('editMdl');
+  renderDash(); renderRec(); renderBal(); updateRB();
+  toast(lang==='hi'?`✅ एंट्री अपडेट: ${num}`:`✅ Entry updated: ${num}`);
+}
+
+// ==================== DASHBOARD ====================
+function renderDash() {
+  const t=today();
+  document.getElementById('dashDate').textContent = new Date().toLocaleDateString(lang==='hi'?'hi-IN':'en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const te=D.entries.filter(e=>e.date===t);
+  const pAmt=te.filter(e=>e.payStatus==='paid').reduce((s,e)=>s+e.amount,0);
+  const uAmt=te.filter(e=>e.payStatus==='unpaid').reduce((s,e)=>s+e.amount,0);
+  const tUA=D.entries.filter(e=>e.payStatus==='unpaid').reduce((s,e)=>s+e.amount,0);
+  const tUC=D.entries.filter(e=>e.payStatus==='unpaid').length;
+  const ap=D.passes.filter(p=>p.status==='active'&&p.expiryDate>=t).length;
+  const hc=D.holdings.filter(h=>h.status==='holding').length;
+  document.getElementById('dashStats').innerHTML=`
+    <div class="stat-card sc-gold"><div class="stat-ico">🚗</div><div class="stat-label">${lang==='hi'?'आज गाड़ियाँ':'Today Vehicles'}</div><div class="stat-value sv-gold">${te.length}</div><div class="stat-sub">${D.entries.length} ${lang==='hi'?'कुल':'total'}</div></div>
+    <div class="stat-card sc-green"><div class="stat-ico">💰</div><div class="stat-label">${lang==='hi'?'आज मिला':'Today Collected'}</div><div class="stat-value sv-green">₹${pAmt}</div><div class="stat-sub">${te.filter(e=>e.payStatus==='paid').length} ${lang==='hi'?'पेमेंट':'payments'}</div></div>
+    <div class="stat-card sc-red"><div class="stat-ico">⏳</div><div class="stat-label">${lang==='hi'?'आज बाकी':'Today Pending'}</div><div class="stat-value sv-red">₹${uAmt}</div><div class="stat-sub">${lang==='hi'?'कुल':'total'} ₹${tUA} (${tUC})</div></div>
+    <div class="stat-card sc-purple"><div class="stat-ico">🎫</div><div class="stat-label">${lang==='hi'?'एक्टिव पास':'Active Passes'}</div><div class="stat-value sv-purple">${ap}</div></div>
+    <div class="stat-card sc-orange"><div class="stat-ico">⏸</div><div class="stat-label">${lang==='hi'?'होल्डिंग':'Holdings'}</div><div class="stat-value sv-orange">${hc}</div></div>`;
+  document.getElementById('dashTypeSummary').innerHTML=`
+    <div class="sc"><div class="lbl">🛺 ${lang==='hi'?'ऑटो':'Auto'}</div><div class="val" style="color:var(--gold)">${te.filter(e=>e.type==='auto').length}</div></div>
+    <div class="sc"><div class="lbl">🏍️ ${lang==='hi'?'बाइक':'Bike'}</div><div class="val" style="color:var(--blue2)">${te.filter(e=>e.type==='bike').length}</div></div>
+    <div class="sc"><div class="lbl">🚗 ${lang==='hi'?'कार':'Car'}</div><div class="val" style="color:var(--green)">${te.filter(e=>e.type==='car').length}</div></div>
+    <div class="sc"><div class="lbl">🎫 Pass / Daily</div><div class="val" style="color:var(--purple)">${te.filter(e=>e.payType==='pass').length} / ${te.filter(e=>e.payType==='daily').length}</div></div>`;
+  const tbody=document.getElementById('todayTbody');
+  if(!te.length){tbody.innerHTML=`<tr><td colspan="8"><div class="empty"><div class="ei">🅿️</div><p>${lang==='hi'?'आज कोई एंट्री नहीं':'No entries today'}</p></div></td></tr>`;}
+  else{tbody.innerHTML=te.slice().reverse().map(e=>`<tr>
+    <td>${ti(e.type)} <span class="badge bg-${e.type}">${e.type.toUpperCase()}</span></td>
+    <td><div class="td-vnum">${e.vehicleNum}</div></td>
+    <td>${e.owner}<div class="td-time">${e.mobile||''}</div></td>
+    <td>${fmtDT(e.time)}</td>
+    <td><strong>₹${e.amount}</strong></td>
+    <td>${e.payType==='pass'?`<span class="badge bg-pass">${t('pass')}</span>`:`<span class="badge bg-daily">${t('daily')}</span>`}</td>
+    <td><span class="badge bg-${e.payStatus}">${e.payStatus==='paid'?t('paid'):t('unpaid')}</span></td>
+    <td class="flex gap-2">${hasPerm('entry')&&e.payStatus==='unpaid'?`<button class="btn btn-green btn-xs" onclick="markPaid('${e.id}')">✅</button>`:''}<button class="btn btn-blue btn-xs" onclick="openEditEntry('${e.id}')">✏️</button><button class="btn btn-ghost btn-xs" onclick="delEntry('${e.id}')">🗑</button></td>
+  </tr>`).join('');}
+  document.getElementById('todayCount').textContent=`${lang==='hi'?'कुल':'Total'}: ${te.length}`;
+  // Expiring passes
+  const exp=D.passes.filter(p=>{const d=dBet(t,p.expiryDate);return d>=0&&d<=7&&p.status==='active';});
+  const sec=document.getElementById('expPassSection');
+  if(exp.length){sec.style.display='';sec.innerHTML=`<div class="card"><div class="card-title" style="color:var(--red2);margin-bottom:14px">⚠️ ${lang==='hi'?'पास जल्द एक्सपायर होंगे':'Passes Expiring Soon'}</div>${exp.map(p=>{const d=dBet(t,p.expiryDate);return`<div class="alert ${d<=2?'al-red':'al-gold'}"><div class="al-ico">${d===0?'🚨':'⚠️'}</div><div class="al-body"><div class="al-title">${ti(p.type)} ${p.vehicleNum} — ${p.owner}</div><div class="al-sub">${d===0?(lang==='hi'?'आज EXPIRE!':'Expires TODAY!'):d+' '+(lang==='hi'?'दिन में':'days left')} | ${lang==='hi'?'मोबाइल':'Mobile'}: ${p.mobile||'N/A'} | ${fmtDate(p.expiryDate)}</div></div></div>`;}).join('')}</div>`;}
+  else sec.style.display='none';
+}
+
+// ==================== RECORDS ====================
+function renderRec() {
+  const ft_=document.getElementById('fType').value; const fs=document.getElementById('fStat').value;
+  const fdt=document.getElementById('fDate').value; const fsrch=(document.getElementById('srchNum').value||'').toUpperCase();
+  let en=D.entries.slice().reverse();
+  if(ft_!=='all')en=en.filter(e=>e.type===ft_); if(fs!=='all')en=en.filter(e=>e.payStatus===fs);
+  if(fdt)en=en.filter(e=>e.date===fdt); if(fsrch)en=en.filter(e=>e.vehicleNum.replace(/\s/g,'').includes(fsrch.replace(/\s/g,'')));
+  const tbody=document.getElementById('recTbody');
+  if(!en.length){tbody.innerHTML=`<tr><td colspan="9"><div class="empty"><div class="ei">📋</div><p>${lang==='hi'?'कोई रिकॉर्ड नहीं':'No records found'}</p></div></td></tr>`;return;}
+  tbody.innerHTML=en.map(e=>`<tr>
+    <td>${fmtDT(e.time)}</td>
+    <td>${ti(e.type)} <span class="badge bg-${e.type}">${e.type.toUpperCase()}</span></td>
+    <td><div class="td-vnum">${e.vehicleNum}</div></td>
+    <td>${e.owner}</td>
+    <td>${e.mobile||'-'}</td>
+    <td>${e.payType==='pass'?`<span class="badge bg-pass">${t('pass')}</span>`:`<span class="badge bg-daily">${t('daily')}</span>`}</td>
+    <td><strong>₹${e.amount}</strong></td>
+    <td><span class="badge bg-${e.payStatus}">${e.payStatus==='paid'?t('paid'):t('unpaid')}</span></td>
+    <td class="flex gap-2">${hasPerm('entry')&&e.payStatus==='unpaid'?`<button class="btn btn-green btn-xs" onclick="markPaid('${e.id}')">Pay</button>`:''}<button class="btn btn-blue btn-xs" onclick="openEditEntry('${e.id}')">✏️</button><button class="btn btn-ghost btn-xs" onclick="delEntry('${e.id}')">🗑</button></td>
+  </tr>`).join('');
+}
+
+// ==================== BALANCE ====================
+function initBalSel() {
+  const ms=document.getElementById('balMon'); const ys=document.getElementById('balYr'); if(ms.options.length)return;
+  const mons=lang==='hi'?['जनवरी','फरवरी','मार्च','अप्रैल','मई','जून','जुलाई','अगस्त','सितंबर','अक्टूबर','नवंबर','दिसंबर']:['January','February','March','April','May','June','July','August','September','October','November','December'];
+  mons.forEach((m,i)=>{const o=document.createElement('option');o.value=i+1;o.textContent=m;ms.appendChild(o);});
+  const yr=new Date().getFullYear(); for(let y=yr;y>=yr-3;y--){const o=document.createElement('option');o.value=y;o.textContent=y;ys.appendChild(o);}
+  ms.value=new Date().getMonth()+1; ys.value=yr;
+}
+function setThisMon(){document.getElementById('balMon').value=new Date().getMonth()+1;document.getElementById('balYr').value=new Date().getFullYear();renderBal();}
+function renderBal() {
+  initBalSel();
+  const mo=parseInt(document.getElementById('balMon').value); const yr=parseInt(document.getElementById('balYr').value);
+  const srch=(document.getElementById('balVSrch').value||'').toUpperCase();
+  const pfx=`${yr}-${String(mo).padStart(2,'0')}`; const me=D.entries.filter(e=>e.date.startsWith(pfx));
+  const tP=me.filter(e=>e.payStatus==='paid').reduce((s,e)=>s+e.amount,0); const tU=me.filter(e=>e.payStatus==='unpaid').reduce((s,e)=>s+e.amount,0);
+  document.getElementById('balStats').innerHTML=`
+    <div class="stat-card sc-gold"><div class="stat-ico">🚗</div><div class="stat-label">${lang==='hi'?'कुल एंट्री':'Total Entries'}</div><div class="stat-value sv-gold">${me.length}</div></div>
+    <div class="stat-card sc-blue"><div class="stat-ico">💵</div><div class="stat-label">${lang==='hi'?'कुल राशि':'Total Amount'}</div><div class="stat-value sv-blue">₹${tP+tU}</div></div>
+    <div class="stat-card sc-green"><div class="stat-ico">✅</div><div class="stat-label">Paid</div><div class="stat-value sv-green">₹${tP}</div></div>
+    <div class="stat-card sc-red"><div class="stat-ico">❌</div><div class="stat-label">${lang==='hi'?'बाकी':'Pending'}</div><div class="stat-value sv-red">₹${tU}</div></div>`;
+  // Daily
+  const dim=new Date(yr,mo,0).getDate(); let dh='';
+  const shortMon=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  for(let day=1;day<=dim;day++){const ds=`${yr}-${String(mo).padStart(2,'0')}-${String(day).padStart(2,'0')}`;const de=me.filter(e=>e.date===ds);if(!de.length)continue;const dp=de.filter(e=>e.payStatus==='paid').reduce((s,e)=>s+e.amount,0);const du=de.filter(e=>e.payStatus==='unpaid').reduce((s,e)=>s+e.amount,0);dh+=`<div class="day-row"><div style="font-weight:700">📅 ${day} ${shortMon[mo-1]} ${yr}</div><div><span class="text3">${lang==='hi'?'गाड़ियाँ':'Vehicles'}</span><br><strong>${de.length}</strong></div><div><span class="text3">Paid</span><br><strong style="color:var(--green)">₹${dp}</strong></div><div><span class="text3">${lang==='hi'?'बाकी':'Pending'}</span><br><strong style="color:${du>0?'var(--red2)':'var(--text3)'}">₹${du}</strong></div></div>`;}
+  document.getElementById('balDaily').innerHTML=dh||`<div class="empty"><div class="ei">📅</div><p>${lang==='hi'?'इस महीने कोई एंट्री नहीं':'No entries this month'}</p></div>`;
+  // Vehicle wise
+  const vm={}; me.forEach(e=>{if(!vm[e.vehicleNum])vm[e.vehicleNum]={vehicleNum:e.vehicleNum,owner:e.owner,mobile:e.mobile,type:e.type,entries:[],paid:0,unpaid:0};vm[e.vehicleNum].entries.push(e);if(e.payStatus==='paid')vm[e.vehicleNum].paid+=e.amount;else vm[e.vehicleNum].unpaid+=e.amount;});
+  let vl=Object.values(vm); if(srch)vl=vl.filter(v=>v.vehicleNum.replace(/\s/g,'').includes(srch.replace(/\s/g,''))); vl.sort((a,b)=>b.unpaid-a.unpaid);
+  if(!vl.length){document.getElementById('balVList').innerHTML=`<div class="empty"><div class="ei">🚗</div><p>${lang==='hi'?'कोई डेटा नहीं':'No data'}</p></div>`;return;}
+  document.getElementById('balVList').innerHTML=vl.map((v,i)=>`<div class="veh-bal-card" onclick="toggleVBD('vbd${i}',this)">
+    <div class="flex aic jb">
+      <div class="flex aic gap-2"><span style="font-size:1.3rem">${ti(v.type)}</span><div><div style="font-weight:800;letter-spacing:2px;font-size:.95rem">${v.vehicleNum}</div><div class="text3">${v.owner}${v.mobile?' · '+v.mobile:''}</div></div></div>
+      <div class="flex gap-2 aic">${v.unpaid>0?`<span style="color:var(--red2);font-weight:700">₹${v.unpaid} ${lang==='hi'?'बाकी':'pending'}</span>`:''}<span style="color:var(--green);font-weight:700">₹${v.paid} paid</span><span style="color:var(--text3)">▾</span></div>
+    </div>
+    <div class="vbd-inner" id="vbd${i}">
+      <table style="width:100%"><thead><tr><th>${lang==='hi'?'तारीख':'Date'}</th><th>${lang==='hi'?'समय':'Time'}</th><th>${lang==='hi'?'प्रकार':'Type'}</th><th>₹</th><th>${lang==='hi'?'स्थिति':'Status'}</th><th>${lang==='hi'?'कार्य':'Action'}</th></tr></thead>
+      <tbody>${v.entries.map(e=>`<tr><td>${fmtDate(e.date)}</td><td>${fmtTime(e.time)}</td><td>${e.payType==='pass'?`<span class="badge bg-pass">${t('pass')}</span>`:`<span class="badge bg-daily">${t('daily')}</span>`}</td><td><strong>₹${e.amount}</strong></td><td><span class="badge bg-${e.payStatus}">${e.payStatus==='paid'?t('paid'):t('unpaid')}</span></td><td>${hasPerm('entry')&&e.payStatus==='unpaid'?`<button class="btn btn-green btn-xs" onclick="markPaid('${e.id}');renderBal()">Pay</button>`:'-'}</td></tr>`).join('')}</tbody></table>
+      <div class="flex gap-2 mt-2"><div style="background:rgba(22,199,132,.08);border:1px solid rgba(22,199,132,.2);border-radius:8px;padding:6px 12px;font-size:.83rem;font-weight:700;color:var(--green)">Paid: ₹${v.paid}</div>${v.unpaid>0?`<div style="background:rgba(232,64,96,.08);border:1px solid rgba(232,64,96,.2);border-radius:8px;padding:6px 12px;font-size:.83rem;font-weight:700;color:var(--red2)">${lang==='hi'?'बाकी':'Pending'}: ₹${v.unpaid}</div>`:''}</div>
+    </div></div>`).join('');
+}
+function toggleVBD(id, card) { const el=document.getElementById(id); el.classList.toggle('show'); card.classList.toggle('open'); }
+
+// ==================== PASS ====================
+function renderPass() {
+  const t_=today(); const c=document.getElementById('passCards');
+  if(!D.passes.length){c.innerHTML=`<div class="empty"><div class="ei">🎫</div><p>${lang==='hi'?'कोई पास नहीं है':'No passes yet'}</p></div>`;return;}
+  c.innerHTML=D.passes.slice().reverse().map(p=>{const d=dBet(t_,p.expiryDate);const ie=d<0;const ie7=d>=0&&d<=7;
+  return`<div class="pass-card" style="border-color:${ie?'rgba(232,64,96,.4)':ie7?'rgba(232,160,32,.4)':'rgba(124,90,247,.25)'}">
+    <div class="flex aic jb">
+      <div class="pass-num">${ti(p.type)} ${p.vehicleNum}</div>
+      <div class="flex gap-2 aic"><span class="badge ${ie?'bg-expired':'bg-pass'}">${ie?(lang==='hi'?'एक्सपायर':'EXPIRED'):d+' '+(lang==='hi'?'दिन बाकी':'days left')}</span></div>
+    </div>
+    <div class="pass-info-grid">
+      <div class="pif"><label>Owner</label><p>${p.owner}</p></div>
+      <div class="pif"><label>Mobile</label><p>${p.mobile||'N/A'}</p></div>
+      <div class="pif"><label>Pass ID</label><p style="color:var(--text3);font-size:.77rem">${p.id}</p></div>
+      <div class="pif"><label>${lang==='hi'?'शुरू':'Start'}</label><p>${fmtDate(p.startDate)}</p></div>
+      <div class="pif"><label>${lang==='hi'?'एक्सपायर':'Expire'}</label><p style="color:${ie?'var(--red2)':ie7?'var(--gold)':'inherit'}">${fmtDate(p.expiryDate)}</p></div>
+      <div class="pif"><label>Amount</label><p style="color:var(--green)">₹${p.amount}</p></div>
+      <div class="pif"><label>${lang==='hi'?'बनाई':'Created'}</label><p style="font-size:.77rem">${fmtDate(p.createdAt?.split('T')[0]||p.startDate)}</p></div>
+      <div class="pif"><label>${lang==='hi'?'समय':'Time'}</label><p style="font-size:.77rem">${fmtTime(p.createdAt)}</p></div>
+    </div>
+    ${hasPerm('entry')&&ie?`<div class="mt-3"><button class="btn btn-purple btn-sm" onclick="renewPass('${p.id}')">🔄 ${lang==='hi'?'रिन्यू करें':'Renew'}</button></div>`:''}
+  </div>`;}).join('');
+}
+async function renewPass(id) {
+  const p=D.passes.find(x=>x.id===id); if(!p)return;
+  const mo=parseInt(prompt(lang==='hi'?'कितने महीने रिन्यू करें?':'Renew for how many months?','1'))||1;
+  const amt=parseFloat(prompt(lang==='hi'?'नई राशि (₹)?':'New amount (₹)?',p.amount))||p.amount;
+  const newExp=addD(today(),mo*30); const now=new Date().toISOString();
+  showLoader(lang==='hi'?'रिन्यू हो रहा है...':'Renewing...');
+  await SB.update('passes',id,{start_date:today(),expiry_date:newExp,amount:amt,months:mo,status:'active'});
+  const eid='E'+ctr++;
+  await SB.insert('entries',{id:eid,date:today(),time:now,type:p.type,vehicle_num:p.vehicleNum,owner:p.owner,mobile:p.mobile,pay_type:'pass',pay_status:'paid',amount:amt,pass_id:id,added_by:currentUser.id,created_at:now});
+  hideLoader();
+  p.startDate=today(); p.expiryDate=newExp; p.amount=amt; p.months=mo; p.status='active'; p.renewedAt=now;
+  D.entries.push({id:eid,date:today(),time:now,type:p.type,vehicleNum:p.vehicleNum,owner:p.owner,mobile:p.mobile,payType:'pass',payStatus:'paid',amount:amt,passId:id,addedBy:currentUser.id});
+  renderPass(); renderDash(); toast(`✅ ${lang==='hi'?'पास रिन्यू:':'Pass renewed:'} ${p.vehicleNum}`);
+}
+
+// ==================== HOLDINGS ====================
+async function saveHold() {
+  const num=gvn('hn'); const own=document.getElementById('hOwn').value.trim();
+  if(!num||num.replace(/\s/g,'').length<4){toast(lang==='hi'?'गाड़ी नंबर पूरा लिखें!':'Enter complete vehicle number!','error');return;}
+  if(!own){toast(lang==='hi'?'नाम ज़रूरी है!':'Name required!','error');return;}
+  const now=new Date().toISOString();
+  const hid='H'+ctr++;
+  const mob=document.getElementById('hMob').value.trim();
+  const rsn=document.getElementById('hRsn').value.trim();
+  const chg=parseFloat(document.getElementById('hChg').value)||0;
+  const hdt=document.getElementById('hDt').value||today();
+  const note=document.getElementById('hNote').value.trim();
+  showLoader(lang==='hi'?'सेव हो रहा है...':'Saving...');
+  const ok=await SB.insert('holdings',{id:hid,vehicle_num:num,owner:own,mobile:mob,type:sht,reason:rsn,charge_per_day:chg,hold_date:hdt,note:note,status:'holding',release_date:null,added_by:currentUser.id,created_at:now});
+  hideLoader();
+  if(ok){
+    D.holdings.push({id:hid,vehicleNum:num,owner:own,mobile:mob,type:sht,reason:rsn,chargePerDay:chg,holdDate:hdt,note:note,status:'holding',releaseDate:null,createdAt:now,addedBy:currentUser.id});
+    hideMdl('holdMdl'); renderHold(); renderDash();
+    toast(`⏸ ${lang==='hi'?'होल्डिंग सेव:':'Holding saved:'} ${num}`);
+  } else { ctr--; toast('Save failed','error'); }
+}
+async function relHold(id) {
+  const h=D.holdings.find(x=>x.id===id); if(!h)return;
+  if(!confirm(lang==='hi'?`${h.vehicleNum} रिलीज़ करें?`:`Release ${h.vehicleNum}?`))return;
+  const rDate=today(); const rAt=new Date().toISOString();
+  const days=Math.max(1,dBet(h.holdDate,rDate)); const amt=h.chargePerDay*days;
+  showLoader(lang==='hi'?'रिलीज़ हो रहा है...':'Releasing...');
+  await SB.update('holdings',id,{status:'released',release_date:rDate});
+  if(amt>0&&confirm(lang==='hi'?`${days} दिन का चार्ज: ₹${amt}
+एंट्री जोड़ें?`:`${days} day charge: ₹${amt}
+Add entry?`)){
+    const eid='E'+ctr++;
+    const now=new Date().toISOString();
+    await SB.insert('entries',{id:eid,date:rDate,time:now,type:h.type,vehicle_num:h.vehicleNum,owner:h.owner,mobile:h.mobile,pay_type:'daily',pay_status:'paid',amount:amt,pass_id:null,added_by:currentUser.id,created_at:now});
+    D.entries.push({id:eid,date:rDate,time:now,type:h.type,vehicleNum:h.vehicleNum,owner:h.owner,mobile:h.mobile,payType:'daily',payStatus:'paid',amount:amt,passId:null,addedBy:currentUser.id});
+  }
+  hideLoader();
+  h.status='released'; h.releaseDate=rDate; h.releasedAt=rAt;
+  renderHold(); renderDash(); toast(`✅ ${h.vehicleNum} ${lang==='hi'?'रिलीज़ हो गई':'released'}`);
+}
+function renderHold() {
+  const t_=today(); const c=document.getElementById('holdCards');
+  if(!D.holdings.length){c.innerHTML=`<div class="empty"><div class="ei">⏸</div><p>${lang==='hi'?'कोई होल्डिंग नहीं':'No holdings'}</p></div>`;return;}
+  const active=D.holdings.filter(h=>h.status==='holding'); const rel=D.holdings.filter(h=>h.status==='released');
+  let html='';
+  if(active.length){
+    html+=`<div style="font-size:.9rem;font-weight:700;color:var(--orange);margin-bottom:10px">⏸ ${lang==='hi'?'अभी होल्डिंग में':'Currently Holding'} (${active.length})</div>`;
+    html+=active.map(h=>{const days=dBet(h.holdDate,t_);const acc=h.chargePerDay*(days+1);
+    return`<div class="holding-card">
+      <div class="flex aic jb"><div class="pass-num" style="color:var(--orange)">${ti(h.type)} ${h.vehicleNum}</div><span class="badge bg-holding">⏸ ${days+1} ${lang==='hi'?'दिन':'days'}</span></div>
+      <div class="pass-info-grid">
+        <div class="pif"><label>Owner</label><p>${h.owner}</p></div>
+        <div class="pif"><label>Mobile</label><p>${h.mobile||'N/A'}</p></div>
+        <div class="pif"><label>${lang==='hi'?'रोकी तारीख':'Hold Date'}</label><p style="color:var(--orange)">${fmtDate(h.holdDate)}</p></div>
+        <div class="pif"><label>${lang==='hi'?'समय':'Time'}</label><p style="font-size:.77rem">${fmtTime(h.createdAt)}</p></div>
+        <div class="pif"><label>${lang==='hi'?'वजह':'Reason'}</label><p>${h.reason||'-'}</p></div>
+        <div class="pif"><label>${lang==='hi'?'चार्ज/दिन':'Charge/Day'}</label><p>₹${h.chargePerDay}</p></div>
+        <div class="pif"><label>${lang==='hi'?'कुल चार्ज':'Total Charge'}</label><p style="color:var(--red2);font-weight:800">₹${acc}</p></div>
+      </div>
+      ${h.note?`<div class="text3 mt-2">📝 ${h.note}</div>`:''}
+      ${hasPerm('entry')?`<div class="mt-2"><button class="btn btn-green btn-sm" onclick="relHold('${h.id}')">✅ ${lang==='hi'?'रिलीज़ करें':'Release'}</button></div>`:''}
+    </div>`;}).join('');
+  }
+  if(rel.length){html+=`<div class="divider"></div><div style="font-size:.9rem;font-weight:700;color:var(--green);margin-bottom:10px">✅ ${lang==='hi'?'रिलीज़ हो गईं':'Released'} (${rel.length})</div>`;
+  html+=rel.map(h=>`<div class="card" style="border-color:rgba(22,199,132,.2);padding:14px 16px">
+    <div class="flex aic jb"><div><strong style="letter-spacing:2px">${ti(h.type)} ${h.vehicleNum}</strong> <span class="text3">— ${h.owner}</span></div><span class="badge bg-released">✅ ${lang==='hi'?'रिलीज़':'Released'}</span></div>
+    <div class="text3 mt-2">${lang==='hi'?'रोकी':'Hold'}: ${fmtDate(h.holdDate)} ${fmtTime(h.createdAt)} → ${lang==='hi'?'रिलीज़':'Release'}: ${fmtDate(h.releaseDate)} ${fmtTime(h.releasedAt)}</div>
+  </div>`).join('');}
+  c.innerHTML=html;
+}
+
+// ==================== SCRAP ====================
+async function saveScrap() {
+  const num=gvn('sn'); const own=document.getElementById('sOwn').value.trim();
+  if(!num||num.replace(/\s/g,'').length<4){toast('Complete vehicle number!','error');return;}
+  const now=new Date().toISOString();
+  const sid='SC'+ctr++;
+  const mob=document.getElementById('sMob').value.trim();
+  const sdt=document.getElementById('sDt').value||today();
+  const sval=parseFloat(document.getElementById('sVal').value)||0;
+  const dlr=document.getElementById('sDlr').value.trim();
+  const note=document.getElementById('sNote').value.trim();
+  showLoader(lang==='hi'?'सेव हो रहा है...':'Saving...');
+  const ok=await SB.insert('scraps',{id:sid,vehicle_num:num,owner:own,mobile:mob,scrap_date:sdt,scrap_value:sval,dealer:dlr,note:note,added_by:currentUser.id,created_at:now});
+  hideLoader();
+  if(ok){
+    D.scraps.push({id:sid,vehicleNum:num,owner:own,mobile:mob,scrapDate:sdt,scrapValue:sval,dealer:dlr,note:note,createdAt:now,addedBy:currentUser.id});
+    hideMdl('scrapMdl'); renderScrap(); toast(`🚮 ${lang==='hi'?'स्क्रैप एंट्री:':'Scrap entry:'} ${num}`);
+  } else { ctr--; toast('Save failed','error'); }
+}
+async function delScrap(id){if(!confirm(lang==='hi'?'डिलीट करें?':'Delete?'))return;showLoader();const ok=await SB.del('scraps',id);hideLoader();if(ok){D.scraps=D.scraps.filter(x=>x.id!==id);renderScrap();toast('Deleted','info');}else{toast('Delete failed','error');}}
+function renderScrap() {
+  const tv=D.scraps.reduce((s,x)=>s+x.scrapValue,0);
+  document.getElementById('scrapStats').innerHTML=`<div class="stat-card sc-red"><div class="stat-ico">🚮</div><div class="stat-label">${lang==='hi'?'कुल स्क्रैप':'Total Scraps'}</div><div class="stat-value sv-red">${D.scraps.length}</div></div><div class="stat-card sc-orange"><div class="stat-ico">💰</div><div class="stat-label">${lang==='hi'?'कुल मूल्य':'Total Value'}</div><div class="stat-value sv-orange">₹${tv}</div></div>`;
+  const c=document.getElementById('scrapCards');
+  if(!D.scraps.length){c.innerHTML=`<div class="empty"><div class="ei">🚮</div><p>${lang==='hi'?'कोई स्क्रैप एंट्री नहीं':'No scrap entries'}</p></div>`;return;}
+  c.innerHTML=D.scraps.slice().reverse().map(s=>`<div class="scrap-card">
+    <div class="flex aic jb"><div class="pass-num" style="color:var(--red2)">🚮 ${s.vehicleNum}</div><span class="badge bg-scrap">SCRAP</span></div>
+    <div class="pass-info-grid">
+      <div class="pif"><label>Owner</label><p>${s.owner}</p></div>
+      <div class="pif"><label>Mobile</label><p>${s.mobile||'N/A'}</p></div>
+      <div class="pif"><label>${lang==='hi'?'स्क्रैप तारीख':'Scrap Date'}</label><p style="color:var(--red2)">${fmtDate(s.scrapDate)}</p></div>
+      <div class="pif"><label>${lang==='hi'?'दर्ज तारीख':'Entry Date'}</label><p style="font-size:.77rem">${fmtDate(s.createdAt?.split('T')[0])}</p></div>
+      <div class="pif"><label>${lang==='hi'?'समय':'Time'}</label><p style="font-size:.77rem">${fmtTime(s.createdAt)}</p></div>
+      <div class="pif"><label>${lang==='hi'?'मूल्य':'Value'}</label><p style="color:var(--orange)">₹${s.scrapValue}</p></div>
+      <div class="pif"><label>Dealer</label><p>${s.dealer||'-'}</p></div>
+      <div class="pif"><label>ID</label><p style="color:var(--text3);font-size:.73rem">${s.id}</p></div>
+    </div>
+    ${s.note?`<div class="text3 mt-2">📝 ${s.note}</div>`:''}
+    ${hasPerm('entry')?`<div class="mt-2"><button class="btn btn-ghost btn-xs" onclick="delScrap('${s.id}')">🗑 ${lang==='hi'?'डिलीट':'Delete'}</button></div>`:''}
+  </div>`).join('');
+}
+
+// ==================== REMINDERS ====================
+function renderRem() {
+  const t_=today(); const up=D.entries.filter(e=>e.payStatus==='unpaid');
+  const ep=D.passes.filter(p=>{const d=dBet(t_,p.expiryDate);return d>=0&&d<=7&&p.status==='active';});
+  const exd=D.passes.filter(p=>dBet(t_,p.expiryDate)<0&&p.status==='active');
+  const lh=D.holdings.filter(h=>h.status==='holding'&&dBet(h.holdDate,t_)>=3);
+  let html='';
+  if(exd.length){html+=`<div class="fw-800" style="color:var(--red2);margin-bottom:10px;font-size:.92rem">🚨 ${lang==='hi'?'एक्सपायर पास':'Expired Passes'} (${exd.length})</div>`;html+=exd.map(p=>`<div class="alert al-red"><div class="al-ico">🚨</div><div class="al-body"><div class="al-title">${ti(p.type)} ${p.vehicleNum} — ${p.owner}</div><div class="al-sub">${lang==='hi'?'एक्सपायर हुआ':'Expired'}: ${fmtDate(p.expiryDate)} | ${lang==='hi'?'मोबाइल':'Mobile'}: <strong>${p.mobile||'N/A'}</strong></div>${hasPerm('entry')?`<button class="btn btn-purple btn-xs mt-2" onclick="renewPass('${p.id}')">🔄 ${lang==='hi'?'रिन्यू':'Renew'}</button>`:''}</div></div>`).join('');html+='<div class="divider"></div>';}
+  if(ep.length){html+=`<div class="fw-800" style="color:var(--gold);margin-bottom:10px;font-size:.92rem">⚠️ ${lang==='hi'?'जल्द एक्सपायर':'Expiring Soon'} (${ep.length})</div>`;html+=ep.map(p=>{const d=dBet(t_,p.expiryDate);return`<div class="alert al-gold"><div class="al-ico">⚠️</div><div class="al-body"><div class="al-title">${ti(p.type)} ${p.vehicleNum} — ${p.owner}</div><div class="al-sub">${d} ${lang==='hi'?'दिन में एक्सपायर':'days to expire'} (${fmtDate(p.expiryDate)}) | Mobile: <strong>${p.mobile||'N/A'}</strong></div></div></div>`;}).join('');html+='<div class="divider"></div>';}
+  if(lh.length){html+=`<div class="fw-800" style="color:var(--orange);margin-bottom:10px;font-size:.92rem">⏸ ${lang==='hi'?'ज़्यादा दिन होल्डिंग':'Long Holding'} (${lh.length})</div>`;html+=lh.map(h=>{const d=dBet(h.holdDate,t_);return`<div class="alert al-orange"><div class="al-ico">⏸</div><div class="al-body"><div class="al-title">${ti(h.type)} ${h.vehicleNum} — ${h.owner}</div><div class="al-sub">${d+1} ${lang==='hi'?'दिन से होल्डिंग में':'days in holding'} | Mobile: <strong>${h.mobile||'N/A'}</strong> | ${lang==='hi'?'चार्ज':'Charge'}: ₹${h.chargePerDay*(d+1)}</div></div></div>`;}).join('');html+='<div class="divider"></div>';}
+  if(up.length){html+=`<div class="fw-800" style="color:var(--red2);margin-bottom:10px;font-size:.92rem">💸 ${lang==='hi'?'बाकी पेमेंट':'Pending Payments'} (${up.length})</div>`;html+=up.slice().reverse().map(e=>`<div class="alert al-red"><div class="al-ico">💰</div><div class="al-body"><div class="al-title">${ti(e.type)} ${e.vehicleNum} — ${e.owner}</div><div class="al-sub">₹${e.amount} ${lang==='hi'?'बाकी है':'pending'} | ${lang==='hi'?'तारीख':'Date'}: ${fmtDate(e.date)} ${fmtTime(e.time)} | Mobile: <strong>${e.mobile||'N/A'}</strong></div>${hasPerm('entry')?`<button class="btn btn-green btn-xs mt-2" onclick="markPaid('${e.id}');renderRem()">✅ ${lang==='hi'?'पेमेंट करें':'Mark Paid'}</button>`:''}</div></div>`).join('');}
+  if(!html)html=`<div class="empty"><div class="ei">✅</div><p>${lang==='hi'?'सब ठीक है! कोई अलर्ट नहीं।':'All clear! No alerts.'}</p></div>`;
+  document.getElementById('remList').innerHTML=html;
+}
+function updateRB() {
+  const t_=today(); const cnt=D.entries.filter(e=>e.payStatus==='unpaid').length+D.passes.filter(p=>{const d=dBet(t_,p.expiryDate);return d>=0&&d<=7&&p.status==='active';}).length+D.passes.filter(p=>dBet(t_,p.expiryDate)<0&&p.status==='active').length;
+  const b=document.getElementById('remBadge'); b.style.display=cnt>0?'':'none'; b.textContent=cnt;
+}
+
+// ==================== USERS ====================
+function togglePerm(el) { el.classList.toggle('checked'); }
+async function createUser() {
+  const name=document.getElementById('uName').value.trim(); const uid=document.getElementById('uId').value.trim();
+  const pass=document.getElementById('uPass').value; const role=document.getElementById('uRole').value;
+  if(!name||!uid||!pass){toast(lang==='hi'?'सभी फ़ील्ड भरें!':'Fill all fields!','error');return;}
+  if(USERS.find(u=>u.id===uid)){toast(lang==='hi'?'यह ID पहले से है!':'User ID already exists!','error');return;}
+  const perms=[...document.getElementById('permGrid').querySelectorAll('.perm-item.checked')].map(el=>el.dataset.perm);
+  const colors=['#e8a020','#2d7ef7','#16c784','#7c5af7','#f07830','#e84060'];
+  const newUser={id:uid,name,password:pass,role,color:colors[USERS.length%colors.length],permissions:perms,createdAt:new Date().toISOString(),createdBy:currentUser.id};
+  showLoader(lang==='hi'?'यूज़र बन रहा है...':'Creating user...');
+  const ok=await SB.insert('users',{id:uid,name,password:pass,role,color:newUser.color,permissions:JSON.stringify(perms),created_by:currentUser.id,created_at:newUser.createdAt});
+  hideLoader();
+  if(ok){
+    USERS.push(newUser); hideMdl('userMdl'); renderUsers();
+    document.getElementById('uName').value=''; document.getElementById('uId').value=''; document.getElementById('uPass').value='';
+    toast(lang==='hi'?`✅ यूज़र बना: ${name}`:`✅ User created: ${name}`);
+  } else { toast('Failed to create user','error'); }
+}
+async function deleteUser(id) {
+  if(id==='admin'){toast(lang==='hi'?'Admin को डिलीट नहीं कर सकते':'Cannot delete admin','error');return;}
+  if(!confirm(lang==='hi'?'इस यूज़र को डिलीट करें?':'Delete this user?'))return;
+  showLoader();
+  const ok=await SB.del('users',id);
+  hideLoader();
+  if(ok){USERS=USERS.filter(u=>u.id!==id);renderUsers();toast(lang==='hi'?'यूज़र डिलीट हो गया':'User deleted','info');}
+  else{toast('Delete failed','error');}
+}
+function renderUsers() {
+  const c=document.getElementById('userCards');
+  const allPerms=['entry','records','balance','pass','holdings','scrap','users','reminders'];
+  c.innerHTML=USERS.map(u=>{
+    const initials=(u.name||'U').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    return`<div class="user-card">
+      <div class="user-card-avatar" style="background:${u.color||'#e8a020'}">${initials}</div>
+      <div class="user-card-info">
+        <div class="user-card-name">${u.name} ${u.id===currentUser.id?`<span style="color:var(--text3);font-size:.72rem;font-weight:400">(${lang==='hi'?'आप':'you'})</span>`:''}</div>
+        <div class="user-card-meta">ID: <strong>${u.id}</strong> · <span class="badge bg-${u.role}">${u.role.toUpperCase()}</span> · ${lang==='hi'?'बनाया':'Created'}: ${fmtDate(u.createdAt?.split('T')[0])}</div>
+        <div class="access-chips">${allPerms.map(p=>`<span class="access-chip ${u.permissions.includes(p)?'granted':''}">${u.permissions.includes(p)?'✓ ':''} ${p}</span>`).join('')}</div>
+      </div>
+      ${u.id!=='admin'?`<button class="btn btn-ghost btn-xs" onclick="deleteUser('${u.id}')">🗑</button>`:'<span class="badge bg-admin">ADMIN</span>'}
+    </div>`;
+  }).join('');
+}
+
+// ==================== INIT ====================
+document.addEventListener('DOMContentLoaded', () => {
+  // Check if already logged in (session persistence optional)
+  document.getElementById('holdMdl').querySelector('#hDt') && (document.getElementById('hDt').value = today());
+  document.getElementById('sDt') && (document.getElementById('sDt').value = today());
+  applyLang();
+});
+setInterval(() => { if(currentUser) updateRB(); }, 60000);
+setInterval(async () => { if(currentUser){ await loadAllData(); const ap=document.querySelector('.page.active'); if(ap){const pid=ap.id.replace('page-','');if(pid==='dashboard')renderDash();else if(pid==='records')renderRec();} updateRB(); }}, 30000);
+</script>
+</body>
+</html>
 
